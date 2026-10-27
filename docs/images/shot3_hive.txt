@@ -1,0 +1,22 @@
+﻿PS D:\xiangmushixun-bde> docker exec hive-server beeline -u jdbc:hive2://localhost:10000
+0: jdbc:hive2://localhost:10000> show databases;
++----------------+
+| database_name  |
++----------------+
+| default        |
+| ydsh_ods       |
++----------------+
+0: jdbc:hive2://localhost:10000> show tables in ydsh_ods;
++--------------------+
+|      tab_name      |
++--------------------+
+| dwd_order          |
+| dwd_product        |
+| dwd_user           |
+| ods_order          |
+| ods_order_item     |
+| ods_product        |
+| ods_store          |
+| ods_user           |
+| ods_user_behavior  |
++--------------------+

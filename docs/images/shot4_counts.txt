@@ -1,0 +1,11 @@
+﻿0: jdbc:hive2://localhost:10000> select 'ods_user' tbl, count(*) cnt from ydsh_ods.ods_user union all ...;
++--------------------+--------+
+|        tbl         |  cnt   |
++--------------------+--------+
+| ods_order_item     | 37549  |
+| ods_user_behavior  | 60000  |
+| ods_order          | 15600  |
+| ods_product        | 600    |
+| ods_user           | 1000   |
+| ods_store          | 60     |
++--------------------+--------+

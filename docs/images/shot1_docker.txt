@@ -1,0 +1,10 @@
+﻿PS D:\xiangmushixun-bde> docker --version
+Docker version 29.9.2, build a82e528
+PS D:\xiangmushixun-bde> docker compose version
+Docker Compose version v5.6.1
+
+PS D:\xiangmushixun-bde> docker ps
+NAMES            STATUS                    PORTS
+hive-server      Up 52 minutes             0.0.0.0:10000->10000/tcp, [::]:10000->10000/tcp, 0.0.0.0:10002->10002/tcp, [::]:10002->10002/tcp
+hive-metastore   Up 57 minutes             0.0.0.0:9083->9083/tcp, [::]:9083->9083/tcp
+mysql            Up 57 minutes (healthy)   0.0.0.0:3307->3306/tcp, [::]:3307->3306/tcp
