@@ -107,6 +107,10 @@ for f in ods/create_ods.sql ods/load_ods.sql \
 done
 ```
 
+> **建表前先确认元数据字符集**：Hive 官方 metastore 把注释列定义成 `latin1`，中文字段注释会被 MySQL 静默替换成 `?`。本项目已改造为 `utf8mb4`，新环境要重跑请先执行 `docs/环境搭建笔记.md` 第六节的 6 条 `ALTER TABLE`。
+>
+> 另：`docker restart hive-server` 会因容器内 pid 文件残留陷入重启循环，需改用 `docker rm -f hive-server && docker compose up -d hive-server`。
+
 ## 六、当前进度与核心成果
 
 ### 6.1 库表规模
