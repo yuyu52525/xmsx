@@ -1,0 +1,62 @@
+metric	before_cnt	after_cnt	fix_rate
+user.age 缺失	51	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+user.email 缺失（保留并打标）	193	193	0.0
+metric	before_cnt	after_cnt	fix_rate
+product.launch_date 缺失	11	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+order.pay_amount 缺失	0	0	0.0
+metric	before_cnt	after_cnt	fix_rate
+order 重复行数（总行数 - 唯一 order_id）	600	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+order_item / behavior 主键重复行数	0	0	0.0
+metric	before_cnt	after_cnt	fix_rate
+user.register_date 非标准格式	125	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+user.phone 非 11 位纯数字	102	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+order.order_date 非标准格式	1902	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+behavior.behavior_time 非标准格式	6088	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+order.order_timestamp 非标准格式	0	0	0.0
+metric	before_cnt	after_cnt	fix_rate
+order.pay_amount 负金额	310	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+order.pay_amount 超大金额（>11356.33）	312	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+user.age 异常（<1 或 >120）	27	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+product.price 异常（<=0 或 >100000）	36	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+order_item.quantity 异常（<=0 或 >50）	1081	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+order_item.unit_price 异常（<=0）	798	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+user.gender 非规范取值	498	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+user.member_level 非规范取值	108	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+order.order_status 非规范取值	1375	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+order.pay_type 非规范取值	651	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+order.channel 非规范取值	310	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+behavior.behavior_type 非规范取值	57551	0	100.0
+metric	before_cnt	after_cnt	fix_rate
+product.category 首尾空格/取值种类 16->8	27	0	100.0
+field	ods_types	dwd_types
+gender	8	3
+field	ods_types	dwd_types
+member_level	12	4
+field	ods_types	dwd_types
+order_status	12	5
+field	ods_types	dwd_types
+pay_type	7	4
+field	ods_types	dwd_types
+channel	6	4
+field	ods_types	dwd_types
+behavior_type	10	4
+field	ods_types	dwd_types
+category	16	8
