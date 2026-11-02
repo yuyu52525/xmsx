@@ -1,0 +1,56 @@
+check_item
+0) 表行数
+tbl	cnt
+stg_order_enum	15000
+stg_user_enum	1000
+stg_behavior_enum	60000
+stg_product_enum	600
+gender	cnt
+女	429
+男	379
+未知	192
+member_level	imputed	cnt
+金卡会员	0	273
+钻石会员	0	253
+普通会员	14	244
+银卡会员	0	230
+order_status	cnt
+已完成	5668
+已支付	4324
+待支付	2116
+已取消	2075
+退款中	817
+pay_type	cnt
+微信支付	4001
+支付宝	3973
+货到付款	3551
+银行卡	3475
+channel	cnt
+APP	3864
+门店	3724
+PC官网	3714
+小程序	3698
+behavior_type	cnt
+浏览	34160
+购买	11969
+加购	8286
+收藏	5585
+category	cnt
+运动户外	91
+数码家电	81
+图书文娱	76
+服饰鞋包	75
+食品生鲜	74
+家居生活	69
+美妆个护	68
+母婴玩具	66
+gender_bad
+0
+member_level_bad
+0
+order_status_bad	pay_type_bad	channel_bad
+0	0	0
+behavior_type_bad
+0
+category_space_bad	brand_space_bad
+0	0

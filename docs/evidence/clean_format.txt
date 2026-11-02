@@ -1,0 +1,30 @@
+check_item
+1) 清洗后行数（清洗前：order 15000 / item 37549 / user 1000 / product 600 / behavior 60000）
+tbl	after_cnt
+order	14398
+tbl	after_cnt
+item	36468
+tbl	after_cnt
+user	1000
+tbl	after_cnt
+product	600
+tbl	after_cnt
+behavior	60000
+neg	huge	mn	mx
+0	0	20.33	4999.85
+check_item	bad_cnt
+order_date 非标准	0
+check_item	bad_cnt
+register_date 非标准	0
+check_item	bad_cnt
+launch_date 非标准	0
+check_item	bad_cnt
+behavior_time 非标准	0
+phone_len	fixed_cnt	cnt
+11	0	1000
+price_bad	price_fixed_cnt
+0	36
+mn	mx	cnt
+1	5	36468
+price_bad	price_fixed_cnt	mn	mx
+0	773	20.0	8998.97

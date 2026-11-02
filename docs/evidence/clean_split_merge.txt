@@ -1,0 +1,83 @@
+check_item
+1) 编码映射表
+dim_member_level.level_code	dim_member_level.level_name	dim_member_level.level_rank
+L1	普通会员	1
+L2	银卡会员	2
+L3	金卡会员	3
+L4	钻石会员	4
+dim_pay_type.pay_code	dim_pay_type.pay_name	dim_pay_type.pay_category
+P1	支付宝	第三方支付
+P2	微信支付	第三方支付
+P3	银行卡	银行渠道
+P4	货到付款	线下支付
+dim_order_status.status_code	dim_order_status.status_name	dim_order_status.is_paid	dim_order_status.is_valid_revenue
+S1	待支付	0	0
+S2	已支付	1	1
+S3	已完成	1	1
+S4	已取消	0	0
+S5	退款中	1	0
+dim_channel.channel_code	dim_channel.channel_name	dim_channel.is_online
+C1	门店	0
+C2	APP	1
+C3	小程序	1
+C4	PC官网	1
+check_item
+2) 编码未命中数（应全为 0）
+level_null
+0
+pay_null	status_null	channel_null
+0	0	0
+check_item
+3) order_timestamp 非标准数（应为 0）
+bad_cnt
+0
+check_item
+3b) order_timestamp 样例
+order_id	order_date	order_time	order_timestamp	order_month	order_hour
+O2024007475	2024-01-01	01:36:11	2024-01-01 01:36:11	2024-01	1
+O2024003511	2024-01-01	02:32:36	2024-01-01 02:32:36	2024-01	2
+O2024001572	2024-01-01	02:33:38	2024-01-01 02:33:38	2024-01	2
+O2024014272	2024-01-01	03:03:20	2024-01-01 03:03:20	2024-01	3
+O2024005169	2024-01-01	03:07:30	2024-01-01 03:07:30	2024-01	3
+check_item
+4) region 合并结果（前 10）
+region	region_area	cnt
+重庆市-重庆	西南	76
+上海市-上海	华东	70
+北京市-北京	华北	70
+陕西省-渭南	西北	20
+浙江省-杭州	华东	20
+辽宁省-锦州	东北	19
+福建省-福州	华东	19
+河南省-许昌	华中	18
+河南省-开封	华中	18
+辽宁省-鞍山	东北	18
+check_item
+4b) 大区分布
+region_area	cnt
+华东	399
+华中	179
+西南	136
+西北	79
+东北	75
+华北	70
+华南	62
+check_item
+4c) region 空值数（应为 0）
+region_bad	area_other
+0	0
+check_item
+5) 订单月份分布
+order_month	cnt	gmv
+2024-01	1228	3158704.7
+2024-02	1143	2915145.59
+2024-03	1236	3087726.84
+2024-04	1174	3025844.79
+2024-05	1249	3080528.74
+2024-06	1110	2829996.31
+2024-07	1200	2979236.8
+2024-08	1223	3039882.76
+2024-09	1173	2929450.71
+2024-10	1243	2963200.54
+2024-11	1183	2995222.54
+2024-12	1236	3111746.74

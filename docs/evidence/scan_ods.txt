@@ -1,0 +1,402 @@
+﻿# 第 2 周 ODS 层数据摸底扫描输出（beeline tsv2 原样结果，未做修改）
+# 生成方式：docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /tmp/scanN.sql
+
+# ============ 扫描批次 1：行数 / 枚举取值 / 金额分位（前 11 组） ============
+
+section
+### 1 行数校验
+t	c
+ods_product	600
+ods_order_item	37549
+ods_user	1000
+ods_store	60
+ods_user_behavior	60000
+ods_order	15600
+section
+### 2 user.gender
+gender	c
+女	212
+男	182
+male	110
+F	109
+female	108
+未知	108
+M	87
+	84
+section
+### 3 user.member_level
+member_level	c
+金卡会员	251
+钻石会员	232
+普通会员	208
+银卡会员	201
+钻石	21
+银卡	16
+	14
+silver	13
+金卡	12
+normal	11
+普通	11
+gold	10
+section
+### 4 user.province
+province	c
+陕西省	79
+重庆市	76
+辽宁省	75
+河南省	73
+北京市	70
+上海市	70
+福建省	69
+安徽省	68
+浙江省	67
+山东省	63
+广东省	62
+江苏省	62
+四川省	60
+湖南省	57
+湖北省	49
+section
+### 5 order.order_status
+order_status	c
+已完成	5498
+已支付	4102
+待支付	1990
+已取消	1800
+退款中	835
+1	211
+3	202
+cancelled	198
+已付款	197
+2	193
+完成	192
+4	182
+section
+### 6 order.pay_type
+pay_type	c
+支付宝	3944
+微信支付	3711
+货到付款	3693
+银行卡	3601
+wechat	227
+微信	218
+alipay	206
+section
+### 7 order.channel
+channel	c
+门店	3862
+APP	3854
+小程序	3845
+PC官网	3729
+app	170
+pc	140
+section
+### 8 behavior.behavior_type
+behavior_type	c
+pv	32945
+buy	11393
+cart	7021
+fav	4969
+加购	646
+Cart	619
+收藏	616
+浏览	611
+PV	604
+购买	576
+section
+### 9 product.category
+category	c
+运动户外	88
+数码家电	78
+图书文娱	72
+服饰鞋包	72
+食品生鲜	70
+美妆个护	67
+家居生活	65
+母婴玩具	61
+母婴玩具 	5
+家居生活 	4
+图书文娱 	4
+食品生鲜 	4
+服饰鞋包 	3
+数码家电 	3
+运动户外 	3
+美妆个护 	1
+section
+### 10 product.brand
+brand	c
+安踏	35
+李宁	28
+探路者	23
+中信出版	21
+美赞臣	21
+乐高	21
+优衣库	18
+斯伯丁	17
+伊利	17
+兰蔻	17
+苹果	16
+中华书局	16
+九阳	15
+好孩子	14
+金龙鱼	14
+得力	14
+晨光	14
+海天	13
+格力	13
+欧莱雅	13
+宜家	12
+宝洁	12
+迪卡侬	12
+全友	12
+顾家	11
+华为	11
+帮宝适	11
+联合利华	11
+良品铺子	11
+自然堂	10
+三只松鼠	10
+三星	10
+贝亲	10
+耐克	10
+苏泊尔	10
+索尼	9
+罗莱	9
+蒙牛	9
+海尔	8
+小米	8
+海澜之家	8
+阿迪达斯	8
+波司登	7
+美的	6
+百雀羚	5
+section
+### 11 product.status
+status	c
+在售	510
+下架	53
+缺货	37
+section
+### 12 user.register_date 格式
+
+# ============ 扫描批次 2：日期与手机号格式、大区、订单月份分布 ============
+
+section
+### 12 user.register_date 格式
+fmt	c
+yyyy-MM-dd	875
+yyyy/MM/dd	100
+yyyyMMdd	25
+section
+### 13 user.phone 格式
+fmt	c
+11位纯数字	898
+xxx-xxxx-xxxx	102
+section
+### 14 order.order_date 格式
+fmt	c
+yyyy-MM-dd	13698
+yyyy/MM/dd	1902
+section
+### 15 behavior.behavior_time 格式
+fmt	c
+A_yyyy-MM-dd HH:mm:ss	53912
+B_yyyy/MM/dd HH:mm	6088
+section
+### 16 store.province
+province	c
+浙江省	7
+四川省	6
+湖南省	6
+陕西省	5
+辽宁省	5
+上海市	4
+江苏省	4
+福建省	4
+重庆市	4
+河南省	4
+山东省	3
+湖北省	3
+安徽省	2
+北京市	2
+广东省	1
+section
+### 17 金额分位
+
+# ============ 扫描批次 3：金额分位（percentile_approx）、quantity 分布、表清单 ============
+
+section
+### 17 金额分位
+p50	p99	p999	mx	mn
+2494.365	5510776.62	9309919.347999997	9957781.93	-4994.73
+section
+### 17b 负金额/超大金额计数
+neg_cnt	huge_cnt	super_cnt
+310	312	291
+section
+### 18 quantity 分布
+k	c
+1-49	36468
+<=0	718
+>=50	363
+section
+### 19 现有表
+tab_name
+dwd_order
+dwd_product
+dwd_user
+ods_order
+ods_order_item
+ods_product
+ods_store
+ods_user
+ods_user_behavior
+section
+### 20 order_time 格式
+fmt	c
+HH:mm:ss	15600
+section
+### 21 price 异常
+neg_cnt	huge_cnt	p99
+20	16	410186.42
+section
+### 22 维度编码映射候选
+pay_type	c
+alipay	206
+wechat	227
+微信	218
+微信支付	3711
+支付宝	3944
+货到付款	3693
+银行卡	3601
+
+# ============ 扫描批次 4：金额区间分布、关联完整性、主键唯一性、日期范围 ============
+
+section
+### 23 金额分位(正数)
+p25	p50	p75	p95
+1293.385	2542.53	3809.1200000000003	4835.8925
+section
+### 24 金额区间分布
+band	c
+a_neg	310
+b_0-5k	14978
+e_100k-1M	21
+f_over1M	291
+section
+### 25 关联完整性
+k	c
+order.user_id 无对应用户	0
+order_item.product_id 无对应商品	0
+order.store_id 无对应门店	0
+order_item.order_id 无对应订单	0
+section
+### 26 行为表关联完整性
+k	c
+behavior.user_id 无对应用户	0
+behavior.product_id 无对应商品	0
+section
+### 27 主键唯一性
+k	c
+behavior distinct behavior_id	60000
+order_item 行数	37549
+order_item distinct item_id	37549
+behavior 行数	60000
+section
+### 28 日期范围
+mn	mx	dc
+2024-01-01	2024/12/31	731
+section
+### 29 用户数与年龄
+users	uid	age_null	age_bad
+1000	1000	51	19
+section
+### 30 下单用户数
+buy_users
+1000
+section
+### 31 GMV 原始
+gmv_raw
+1.69446414243E9
+section
+### 32 行为时间范围
+mn	mx
+2024-10-01 00:00:41	2024/12/31 23:40
+section
+### 33 注册日期范围
+mn	mx
+2023-01-01	20241202
+
+# ============ 扫描批次 5：quantity 取值 Top、price 区间、明细金额 vs 订单实付 ============
+
+section
+### 34 quantity 取值 Top
+quantity	c
+5	7394
+3	7359
+4	7333
+1	7276
+2	7106
+0	386
+99	363
+-2	332
+section
+### 35 quantity 描述统计
+mn	mx	p50	p99
+1	99	2.5481043620057076	4.99928185014877
+section
+### 36 price 区间
+band	c
+a_neg	20
+b_0-1k	62
+c_1k-10k	502
+e_over100k	16
+section
+### 37 price 正数分位
+p50	p95	p99	mx
+4690.35	8822.12	415368.3620000012	849897.9
+section
+### 38 明细金额 vs 订单实付
+orders	avg_abs_diff	match_cnt
+15000	141508.12	0
+section
+### 39 discount 范围
+mn	mx	p50
+0.0	0.3	0.14407630522088355
+section
+### 40 明细行数分布
+cnt_per_order	orders
+1	3709
+2	3793
+3	3738
+4	3760
+
+# ============ 补充探针：unit_price 异常与分摊偏差定位 ============
+
+check_item
+1) unit_price 统计
+mn	mx	le0	gt100k	p50	p99
+-8992.96	8998.97	773	0	4395.090793650795	8909.421923809523
+check_item
+2) item_amount <= 0 的明细行
+bad_rows	total_rows
+773	36468
+check_item
+3) 分摊偏差最大的订单
+order_id	alloc_sum	pay
+O2024004915	0.0	4989.47
+O2024014094	0.0	4959.68
+O2024008316	0.0	4935.73
+O2024011022	0.0	4933.53
+O2024013711	0.0	4910.25
+O2024004592	0.0	4906.25
+O2024004548	0.0	4904.28
+O2024011588	0.0	4895.68
+O2024014697	0.0	4868.08
+O2024004185	0.0	4858.73
+check_item
+4) 产品 cost 异常
+cost_le0	mx
+0	6477.49
+
+
