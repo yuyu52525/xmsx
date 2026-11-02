@@ -1,0 +1,18 @@
+# 说明：以下内容为 docs/evidence/dwd_verify.txt 中与「分区 / 分桶」相关的原样输出摘录，
+# 仅删除了无关的列注释与执行计划中的中间算子行，数值未做修改。
+
+# 1) 分桶信息（Num Buckets = 8，Bucket Columns = [user_id]）
+Num Buckets:        	8                   	NULL
+Bucket Columns:     	[user_id]           	NULL
+
+# 2) 分区裁剪：带分区条件，TableScan 只统计 2024-12 分区的 1,236 行
+        Select Operator [SEL_9] (rows=1236 width=1138)
+          TableScan [TS_0] (rows=1236 width=1138)
+
+# 3) 不带分区条件：TableScan 统计全部 12 个分区的 14,398 行
+        Select Operator [SEL_7] (rows=14398 width=1137)
+          TableScan [TS_0] (rows=14398 width=1137)
+
+# 4) 分桶抽样 TABLESAMPLE(BUCKET 1 OUT OF 8 ON user_id)
+bucket1_orders
+1796
