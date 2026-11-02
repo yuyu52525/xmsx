@@ -1,0 +1,115 @@
+col_name	data_type	comment
+order_id	string	????????
+user_id	string	??????? -> dim_user?????
+store_id	string	??????? -> dim_store?
+order_date	string	???? yyyy-MM-dd??? -> dim_date?
+order_time	string	???? HH:mm:ss
+order_timestamp	string	????? yyyy-MM-dd HH:mm:ss
+order_hour	int	?????0-23?
+pay_amount	double	????????
+discount_amount	double	????????
+pay_code	string	????????? -> dim_pay_type?
+pay_name	string	??????
+status_code	string	????????? -> dim_order_status?
+status_name	string	??????
+is_paid	int	?????
+is_valid_revenue	int	????????
+channel_code	string	??????? -> dim_channel?
+channel_name	string	????
+is_online	int	??????
+	NULL	NULL
+# Partition Information	NULL	NULL
+# col_name	data_type	comment
+order_month	string	???? yyyy-MM
+	NULL	NULL
+# Detailed Table Information	NULL	NULL
+Database:           	ydsh_dwd            	NULL
+OwnerType:          	USER                	NULL
+Owner:              	hive                	NULL
+CreateTime:         	Mon Nov 02 00:31:44 UTC 2026	NULL
+LastAccessTime:     	UNKNOWN             	NULL
+Retention:          	0                   	NULL
+Location:           	file:/opt/hive/data/warehouse/ydsh_dwd.db/dwd_order	NULL
+Table Type:         	EXTERNAL_TABLE      	NULL
+Table Parameters:	NULL	NULL
+	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
+	EXTERNAL            	TRUE                
+	TRANSLATED_TO_EXTERNAL	TRUE                
+	bucketing_version   	2                   
+	external.table.purge	TRUE                
+	numFiles            	96                  
+	numPartitions       	12                  
+	numRows             	14398               
+	orc.compress        	snappy              
+	rawDataSize         	16269381            
+	totalSize           	933247              
+	transient_lastDdlTime	1793579504          
+	NULL	NULL
+# Storage Information	NULL	NULL
+SerDe Library:      	org.apache.hadoop.hive.ql.io.orc.OrcSerde	NULL
+InputFormat:        	org.apache.hadoop.hive.ql.io.orc.OrcInputFormat	NULL
+OutputFormat:       	org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat	NULL
+Compressed:         	No                  	NULL
+Num Buckets:        	8                   	NULL
+Bucket Columns:     	[user_id]           	NULL
+Sort Columns:       	[]                  	NULL
+Storage Desc Params:	NULL	NULL
+	serialization.format	1                   
+Explain
+Plan optimized by CBO.
+
+Vertex dependency in root stage
+Reducer 2 <- Map 1 (CUSTOM_SIMPLE_EDGE)
+
+Stage-0
+  Fetch Operator
+    limit:-1
+    Stage-1
+      Reducer 2 vectorized
+      File Output Operator [FS_13]
+        Group By Operator [GBY_12] (rows=1 width=8)
+          Output:["_col0"],aggregations:["count(VALUE._col0)"]
+        <-Map 1 [CUSTOM_SIMPLE_EDGE] vectorized
+          PARTITION_ONLY_SHUFFLE [RS_11]
+            Group By Operator [GBY_10] (rows=1 width=8)
+              Output:["_col0"],aggregations:["count()"]
+              Select Operator [SEL_9] (rows=1236 width=1138)
+                TableScan [TS_0] (rows=1236 width=1138)
+                  ydsh_dwd@dwd_order,dwd_order,Tbl:COMPLETE,Col:COMPLETE
+
+Explain
+Plan optimized by CBO.
+
+Vertex dependency in root stage
+Reducer 2 <- Map 1 (CUSTOM_SIMPLE_EDGE)
+
+Stage-0
+  Fetch Operator
+    limit:-1
+    Stage-1
+      Reducer 2 vectorized
+      File Output Operator [FS_11]
+        Group By Operator [GBY_10] (rows=1 width=8)
+          Output:["_col0"],aggregations:["count(VALUE._col0)"]
+        <-Map 1 [CUSTOM_SIMPLE_EDGE] vectorized
+          PARTITION_ONLY_SHUFFLE [RS_9]
+            Group By Operator [GBY_8] (rows=1 width=8)
+              Output:["_col0"],aggregations:["count()"]
+              Select Operator [SEL_7] (rows=14398 width=1137)
+                TableScan [TS_0] (rows=14398 width=1137)
+                  ydsh_dwd@dwd_order,dwd_order,Tbl:COMPLETE,Col:COMPLETE
+
+orders_with_items	alloc_sum
+14284	3.523185766E7
+orders_without_items
+114
+pay_sum_of_orders_with_items
+3.583330441E7
+o.order_id	o.order_timestamp	u.province	u.member_level	s.store_name	p.category	o.pay_amount	o.status_name
+O2024011172	2024-12-02 00:12:48	江苏省	金卡会员	云购生活·杭州购物中心店	数码家电	4431.37	已完成
+O2024011172	2024-12-02 00:12:48	江苏省	金卡会员	云购生活·杭州购物中心店	美妆个护	4431.37	已完成
+O2024011170	2024-12-18 04:42:27	江苏省	普通会员	云购生活·南通社区店	图书文娱	1489.52	已支付
+O2024011170	2024-12-18 04:42:27	江苏省	普通会员	云购生活·南通社区店	运动户外	1489.52	已支付
+O2024011170	2024-12-18 04:42:27	江苏省	普通会员	云购生活·南通社区店	母婴玩具	1489.52	已支付
+bucket1_orders
+1796

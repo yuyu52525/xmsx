@@ -1,0 +1,84 @@
+check_item
+1) 各表行数
+tbl	cnt
+dim_user	1000
+tbl	cnt
+dim_product	600
+tbl	cnt
+dim_store	60
+tbl	cnt
+dim_date	731
+tbl	cnt
+dwd_order	14398
+tbl	cnt
+dwd_order_item	34979
+tbl	cnt
+dwd_user_behavior	60000
+check_item
+2) 分区列表
+partition
+order_month=2024-01
+order_month=2024-02
+order_month=2024-03
+order_month=2024-04
+order_month=2024-05
+order_month=2024-06
+order_month=2024-07
+order_month=2024-08
+order_month=2024-09
+order_month=2024-10
+order_month=2024-11
+order_month=2024-12
+check_item
+2b) 明细表分区
+partition
+order_month=2024-01
+order_month=2024-02
+order_month=2024-03
+order_month=2024-04
+order_month=2024-05
+order_month=2024-06
+order_month=2024-07
+order_month=2024-08
+order_month=2024-09
+order_month=2024-10
+order_month=2024-11
+order_month=2024-12
+check_item
+2c) 行为表分区
+partition
+behavior_month=2024-10
+behavior_month=2024-11
+behavior_month=2024-12
+check_item
+3) 时间维度范围
+mn	mx	cnt	weekend_cnt
+2023-01-01	2024-12-31	731	209
+check_item
+4) 事实表外键孤儿数（应全为 0）
+order_user_orphan
+0
+order_store_orphan
+0
+item_product_orphan
+0
+behavior_product_orphan
+0
+check_item
+5) 明细分摊金额 vs 有明细订单实付
+item_alloc_sum
+3.583330506E7
+pay_sum_of_orders_with_items
+3.583330441E7
+check_item
+6) 订单数与 GMV
+orders	gmv	aov
+14398	3.611668706E7	2508.45
+check_item
+7) 无效营收订单占比
+status_name	is_valid_revenue	cnt	amt
+已完成	1	5437	1.36767722E7
+已支付	1	4161	1.050850039E7
+待支付	0	2023	5030392.42
+已取消	0	1997	4933423.27
+退款中	0	780	1967598.78
