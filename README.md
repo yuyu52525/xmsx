@@ -44,37 +44,31 @@
 │   └── warehouse/            # Hive 数仓存储目录
 ├── lib/
 │   └── mysql-connector-j-8.0.33.jar   # Hive 连接 MySQL 的 JDBC 驱动
-├── sql/
-│   ├── ods/                  # ODS 建表与导入脚本
-│   │   ├── create_ods.sql
-│   │   └── load_ods.sql
-│   ├── quality/
-│   │   ├── assess_quality.sql         # 第 1 周：五维度质量评估
-│   │   └── assess_week2.sql           # 第 2 周：清洗前后修复率对比（24 项指标）
-│   ├── clean/                # 清洗脚本
-│   │   ├── clean_missing.sql          # 清洗一：缺失值
-│   │   ├── clean_duplicate.sql        # 清洗一：重复值
-│   │   ├── clean_enum.sql             # 清洗二：枚举标准化 + 文本规范化
-│   │   ├── clean_format.sql           # 清洗二：异常值 + 格式标准化
-│   │   └── clean_split_merge.sql      # 清洗二：字段拆分合并 + 编码映射维表
-│   ├── dwd/                  # DWD 层建模与加载
-│   │   ├── create_dwd.sql             # 11 张正式表 DDL（含分区表、分桶表）
-│   │   ├── load_dwd.sql               # ETL 加载 + 加载校验
-│   │   └── verify_dwd.sql             # 分桶信息、分区裁剪、金额闭合校验
-│   └── analysis/
-│       └── eda.sql                    # 探索性分析 19 组查询
-├── docs/
-│   ├── 数仓架构设计文档.md / .docx      # 四层架构 + 星型模型 + 命名规范
-│   ├── 数据质量对比报告.md / .docx      # 五类脏数据修复率（第 2 周）
-│   ├── 探索性分析简报.md / .docx        # KPI 与 8 个维度分析
-│   ├── 数据质量对比表.xlsx              # 修复率 / 枚举收敛 / 行数变化 / 核心指标
-│   ├── 数据质量预评估表.md / .xlsx      # 第 1 周五维度评估
-│   ├── 环境搭建笔记.md / .docx
-│   ├── 乐天_第1周_AI协同日志.md
-│   ├── 第2周_AI协同日志.md
-│   ├── 提交清单核对.md / 提交清单核对_第2周.md
-│   ├── evidence/                       # 全部 SQL 的真实运行输出（可复核）
-│   └── images/第2周/                    # 架构图 2 张 + 运行截图 6 张
+├── 第1周/                     # 第 1 周：环境搭建 + ODS 贴源层 + 质量预评估
+│   ├── sql/
+│   │   ├── ods/               # create_ods.sql、load_ods.sql
+│   │   └── quality/           # assess_quality.sql（五维度质量评估）
+│   ├── docs/
+│   │   ├── 环境搭建笔记.md / .docx
+│   │   ├── 数据质量预评估表.md / .xlsx
+│   │   ├── 提交清单核对.md
+│   │   └── images/            # 4 张环境截图
+│   └── 第1周_AI协同日志.md
+├── 第2周/                     # 第 2 周：清洗进阶 + 四层数仓 + 探索性分析
+│   ├── sql/
+│   │   ├── clean/             # 5 个清洗脚本（缺失 / 重复 / 枚举 / 格式 / 拆分合并）
+│   │   ├── dwd/               # 建表、加载、校验
+│   │   ├── quality/           # assess_week2.sql（24 项修复率指标）
+│   │   └── analysis/          # eda.sql（19 组探索性分析）
+│   ├── docs/
+│   │   ├── 数据质量对比报告.md / .docx
+│   │   ├── 数仓架构设计文档.md / .docx
+│   │   ├── 探索性分析简报.md / .docx
+│   │   ├── 数据质量对比表.xlsx
+│   │   ├── 提交清单核对_第2周.md
+│   │   └── images/            # 架构图 2 张 + 证据图 6 张 + 实拍截图 4 张
+│   ├── evidence/              # 全部 SQL 的真实运行输出（可复核）
+│   └── 第2周_AI协同日志.md
 └── README.md
 ```
 
@@ -90,24 +84,25 @@ docker ps
 # 3. 进入 Hive 客户端
 docker exec -it hive-server beeline -u jdbc:hive2://localhost:10000
 
-# 4. 建库建表（脚本目录已挂载到容器 /sql）
+# 4. 建库建表（整个仓库已挂载到容器 /repo）
 -- 在 beeline 中执行
-!run /sql/ods/create_ods.sql
+!run /repo/第1周/sql/ods/create_ods.sql
 ```
 
 **跑完整链路（ODS → 清洗 → DWD → 分析）**
 
 ```bash
-for f in ods/create_ods.sql ods/load_ods.sql \
-         clean/clean_missing.sql clean/clean_duplicate.sql \
-         clean/clean_enum.sql clean/clean_format.sql clean/clean_split_merge.sql \
-         dwd/create_dwd.sql dwd/load_dwd.sql dwd/verify_dwd.sql \
-         quality/assess_week2.sql analysis/eda.sql; do
-  docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /sql/$f
+for f in 第1周/sql/ods/create_ods.sql 第1周/sql/ods/load_ods.sql \
+         第2周/sql/clean/clean_missing.sql 第2周/sql/clean/clean_duplicate.sql \
+         第2周/sql/clean/clean_enum.sql 第2周/sql/clean/clean_format.sql \
+         第2周/sql/clean/clean_split_merge.sql \
+         第2周/sql/dwd/create_dwd.sql 第2周/sql/dwd/load_dwd.sql 第2周/sql/dwd/verify_dwd.sql \
+         第2周/sql/quality/assess_week2.sql 第2周/sql/analysis/eda.sql; do
+  docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /repo/$f
 done
 ```
 
-> **建表前先确认元数据字符集**：Hive 官方 metastore 把注释列定义成 `latin1`，中文字段注释会被 MySQL 静默替换成 `?`。本项目已改造为 `utf8mb4`，新环境要重跑请先执行 `docs/环境搭建笔记.md` 第六节的 6 条 `ALTER TABLE`。
+> **建表前先确认元数据字符集**：Hive 官方 metastore 把注释列定义成 `latin1`，中文字段注释会被 MySQL 静默替换成 `?`。本项目已改造为 `utf8mb4`，新环境要重跑请先执行 `第1周/docs/环境搭建笔记.md` 第六节的 6 条 `ALTER TABLE`。
 >
 > 另：`docker restart hive-server` 会因容器内 pid 文件残留陷入重启循环，需改用 `docker rm -f hive-server && docker compose up -d hive-server`。
 

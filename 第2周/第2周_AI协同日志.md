@@ -37,16 +37,16 @@
 
 **由 AI 生成的内容（经我审核后使用）**
 
-- `sql/clean/clean_enum.sql`（枚举标准化 + 文本规范化，4 张 stg 表）
-- `sql/clean/clean_format.sql`（异常值 + 格式标准化，5 张 stg 表 + 2 张中位数辅助表）
-- `sql/clean/clean_split_merge.sql`（时间戳合并、region 合并、4 张编码映射维表）
-- `sql/dwd/create_dwd.sql`（11 张正式表 DDL，含分区表与分桶表）
-- `sql/dwd/load_dwd.sql`、`sql/dwd/verify_dwd.sql`（ETL 加载与结构校验）
-- `sql/quality/assess_week2.sql`（24 项修复率指标）
-- `sql/analysis/eda.sql`（19 组探索性分析）
-- `docs/数仓架构设计文档.md`、`数据质量对比报告.md`、`探索性分析简报.md` 初稿
-- `docs/images/第2周/` 下 2 张架构图（PIL 绘制）与 6 张运行截图（真实输出渲染）
-- `docs/数据质量对比表.xlsx`（4 个 sheet）
+- `第2周/sql/clean/clean_enum.sql`（枚举标准化 + 文本规范化，4 张 stg 表）
+- `第2周/sql/clean/clean_format.sql`（异常值 + 格式标准化，5 张 stg 表 + 2 张中位数辅助表）
+- `第2周/sql/clean/clean_split_merge.sql`（时间戳合并、region 合并、4 张编码映射维表）
+- `第2周/sql/dwd/create_dwd.sql`（11 张正式表 DDL，含分区表与分桶表）
+- `第2周/sql/dwd/load_dwd.sql`、`第2周/sql/dwd/verify_dwd.sql`（ETL 加载与结构校验）
+- `第2周/sql/quality/assess_week2.sql`（24 项修复率指标）
+- `第2周/sql/analysis/eda.sql`（19 组探索性分析）
+- `第2周/docs/数仓架构设计文档.md`、`数据质量对比报告.md`、`探索性分析简报.md` 初稿
+- `第2周/docs/images/` 下 2 张架构图（PIL 绘制）、6 张运行输出渲染图与 4 张自截实拍截图
+- `第2周/docs/数据质量对比表.xlsx`（4 个 sheet）
 - 本日志的初稿框架
 
 **由人工完成的内容**
@@ -107,17 +107,17 @@
 
 ## 六、本周关键运行记录
 
-以下为我本人在本机 PowerShell 中实际执行、自行截取的原始画面。截图已插入《数据质量对比报告》与《数仓架构设计文档》对应位置，原图存放于 `docs/images/第2周/`。
+以下为我本人在本机 PowerShell 中实际执行、自行截取的原始画面。截图已插入《数据质量对比报告》与《数仓架构设计文档》对应位置，原图存放于 `第2周/docs/images/`。
 
 **图 2-1　枚举标准化执行结果（取值收敛到规范值域）**
 
-执行：`docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /sql/clean/clean_enum.sql`
+执行：`docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /repo/第2周/sql/clean/clean_enum.sql`
 画面要点：`gender` 分布只剩 `男 / 女 / 未知` 三行；各表"残留"分节全部为 0。
 
 
 **图 2-2　五类脏数据修复率（清洗前后对比）**
 
-执行：`docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /sql/quality/assess_week2.sql`
+执行：`docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /repo/第2周/sql/quality/assess_week2.sql`
 画面要点：24 项指标的修复率全部为 1.0000（邮箱一项 0.9970，保留 193 条可疑地址）。
 
 

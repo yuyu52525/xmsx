@@ -32,11 +32,11 @@
 **由 AI 生成的内容（经我审核后使用）**
 
 - `docker-compose.yml` 初版编排与后续修订
-- `sql/ods/create_ods.sql`（6 张表 DDL，依据数据字典字段）
-- `sql/ods/load_ods.sql`（数据加载 + 行数校验）
-- `sql/quality/assess_quality.sql`（五维度评估，24 项指标）
-- `sql/clean/clean_missing.sql`、`clean_duplicate.sql`（清洗脚本）
-- `docs/环境搭建笔记.md` 初稿、`docs/数据质量预评估表` 初稿
+- `第1周/repo/第1周/sql/ods/create_ods.sql`（6 张表 DDL，依据数据字典字段）
+- `第1周/repo/第1周/sql/ods/load_ods.sql`（数据加载 + 行数校验）
+- `第1周/repo/第1周/sql/quality/assess_quality.sql`（五维度评估，24 项指标）
+- `第2周/sql/clean/clean_missing.sql`、`clean_duplicate.sql`（清洗脚本）
+- `第1周/docs/环境搭建笔记.md` 初稿、`第1周/docs/数据质量预评估表` 初稿
 - 本日志的初稿框架
 
 **由人工完成的内容**
