@@ -29,6 +29,7 @@
 | 11 | 探索性分析要"数据说话"，不能编结论 | 生成 19 组分析 SQL（KPI、月度环比、品类、区域、门店、渠道、会员、时段、窗口函数、分层、漏斗），并主动标注了 3 处数据局限（时间随机、会员随机、行为非漏斗） | 我复核了 KPI 与各维度占比之和（品类合计 100%、大区合计 100%），确认无算错 | 是 |
 | 12 | 把三份 Markdown 转成 Word 交付 | 用项目自带的 `md2docx.py` 转换（支持标题/表格/代码块/图片） | 我打开生成的 docx 检查了图片是否嵌入、表格是否错行 | 是 |
 | 13 | 交付前抽查 `describe formatted dwd_order`，发现字段注释全是 `????????` | 我一开始怀疑是 PowerShell 重定向编码，AI 支持这个假设；但按它给的"容器内重定向再 docker cp"方法验证后**仍是 `?`**，说明假设错了。随后查 MySQL 元数据 `HEX(COMMENT)=3F3F...`、再查字符集，才定位到 `COLUMNS_V2.COMMENT` 是 `latin1`（Hive 官方 schema 遗留），中文写入时被 MySQL 静默替换 | 我否定了"终端编码"的判断，坚持查存储层才找到真因；AI 补出 `PARTITION_KEYS.PKEY_COMMENT` 也需一起改（否则分区字段仍是 `?`），并提醒 `docker restart` 会触发 pid 残留重启循环，需 `rm -f` 重建。改完重建 DWD，行数/孤儿数/金额闭合三项复检全部与修复前一致 | 是（先误判，后纠正） |
+| 14 | 我要自己动手跑一遍验收，不要现成脚本 | 给了 14 条彼此独立、全部只读（`SELECT/SHOW/EXPLAIN`）的命令，每条附预期值；并说明 `describe` 的两处易误读项（`Compressed=No` 是遗留字段、`external.table.purge=TRUE` 意味着 DROP 会删数据） | 我逐条执行，实际输出与预期 14/14 一致；其中 `totalSize=933247`、`numFiles=96`（=12 分区×8 桶）还被补写进架构文档 6.4 节。期间电脑重启导致 `hive-server` 再次 `Restarting (13)`，用同样的两行命令恢复 | 是 |
 
 ---
 
@@ -43,7 +44,7 @@
 - `sql/dwd/load_dwd.sql`、`sql/dwd/verify_dwd.sql`（ETL 加载与结构校验）
 - `sql/quality/assess_week2.sql`（24 项修复率指标）
 - `sql/analysis/eda.sql`（19 组探索性分析）
-- `docs/数仓架构设计文档.md`、`数据质量清洗报告.md`、`探索性分析简报.md` 初稿
+- `docs/数仓架构设计文档.md`、`数据质量对比报告.md`、`探索性分析简报.md` 初稿
 - `docs/images/第2周/` 下 2 张架构图（PIL 绘制）与 6 张运行截图（真实输出渲染）
 - `docs/数据质量对比表.xlsx`（4 个 sheet）
 - 本日志的初稿框架
@@ -67,7 +68,7 @@
 ## 四、问题与解决
 
 - **遇到的问题**：本周最费时的不是写 SQL，而是**三个层次的坑叠加**：
-  1. **环境层**：`hive-server` 因容器内遗留 pid 文件陷入重启循环，日志只给一行 `HiveServer2 running as process 7. Stop it first.`；
+  1. **环境层**：`hive-server` 因容器内遗留 pid 文件陷入重启循环，日志只给一行 `HiveServer2 running as process 7. Stop it first.`。本周共遇到 **4 次**，其中 11 月 3 日那次是电脑重启触发、`docker ps` 显示 `Restarting (13)`（已重启 13 次）——原因已查到：镜像把 pid 写到 `/opt/hive/conf/hiveserver2.pid`，容器重启后文件仍在，而新的 PID 7 被入口脚本自己占用，`kill -0 7` 便误判"已在运行"；
   2. **Hive 语法层**：`group by` 序号不支持、`percentile()` 只吃 bigint、`sequence()` 函数不存在、单条 SQL 21 个指标撞 120 计数器上限，四处都要重新设计语句；
   3. **数据层**：手册给的 P99 阈值被 3.8% 异常值污染；明细单价 773 条为负，导致金额分摊静默算错 60 万——**不报错、结果看起来正常，这是最危险的一类错误**。
 
@@ -101,3 +102,44 @@
   1. 让 AI **先做数据体检再写清洗规则**（先 `distinct`、先分位数、先关联完整性），不要直接按需求清单写 `case when`；
   2. 对 AI 给的阈值、参数，要求它**给出取值依据和验证语句**，可过滤掉大部分"拍脑袋"；
   3. 关键链路上**人工补一道自洽性校验**（如金额闭合、占比合计 100%），这是 AI 最容易漏、也最容易掩盖问题的地方。
+
+---
+
+## 六、本周关键运行记录（截图）
+
+以下截图为我本人在本机 PowerShell 中实际执行、自行截取的原始画面，对应第 2 周五项验收点。图片存放于 `docs/images/第2周/`，文件名与下方一致。
+
+**图 2-1　枚举标准化执行结果（取值收敛到规范值域）**
+
+执行：`docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /sql/clean/clean_enum.sql`
+画面要点：`gender` 分布只剩 `男 / 女 / 未知` 三行；各表"残留"分节全部为 0。
+
+![枚举标准化](images/第2周/截图1_枚举标准化.png)
+
+**图 2-2　五类脏数据修复率（清洗前后对比）**
+
+执行：`docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /sql/quality/assess_week2.sql`
+画面要点：24 项指标的修复率全部为 1.0000（邮箱一项 0.9970，保留 193 条可疑地址）。
+
+![修复率](images/第2周/截图2_修复率.png)
+
+**图 2-3　分区裁剪生效（1,236 行 vs 14,398 行）**
+
+执行：`explain select count(*) from ydsh_dwd.dwd_order where order_month='2024-12';` 与不带 `where` 的同一查询
+画面要点：带分区条件时 `TableScan ... (rows=1236)`，不带时 `(rows=14398)`，扫描量下降 91.4%。
+
+![分区裁剪](images/第2周/截图3_分区裁剪.png)
+
+**图 2-4　分桶落盘与中文字段注释**
+
+执行：`describe formatted ydsh_dwd.dwd_order`
+画面要点：`Num Buckets: 8`、`Bucket Columns: [user_id]`、`numFiles: 96`（=12 分区×8 桶）、`orc.compress: snappy`，字段 comment 为中文。
+
+![分桶与注释](images/第2周/截图4_分桶与注释.png)
+
+**图 2-5　Git 提交记录（可追溯）**
+
+执行：`git log --oneline -10`
+画面要点：第 2 周的提交链，从清洗脚本到最终交付物，每条提交信息对应一个子任务。
+
+![Git 提交记录](images/第2周/截图5_git日志.png)
