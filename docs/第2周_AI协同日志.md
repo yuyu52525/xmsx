@@ -105,41 +105,35 @@
 
 ---
 
-## 六、本周关键运行记录（截图）
+## 六、本周关键运行记录
 
-以下截图为我本人在本机 PowerShell 中实际执行、自行截取的原始画面，对应第 2 周五项验收点。图片存放于 `docs/images/第2周/`，文件名与下方一致。
+以下为我本人在本机 PowerShell 中实际执行、自行截取的原始画面。截图已插入《数据质量对比报告》与《数仓架构设计文档》对应位置，原图存放于 `docs/images/第2周/`。
 
 **图 2-1　枚举标准化执行结果（取值收敛到规范值域）**
 
 执行：`docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /sql/clean/clean_enum.sql`
 画面要点：`gender` 分布只剩 `男 / 女 / 未知` 三行；各表"残留"分节全部为 0。
 
-![枚举标准化](images/第2周/截图1_枚举标准化.png)
 
 **图 2-2　五类脏数据修复率（清洗前后对比）**
 
 执行：`docker exec hive-server beeline -u jdbc:hive2://localhost:10000 -f /sql/quality/assess_week2.sql`
 画面要点：24 项指标的修复率全部为 1.0000（邮箱一项 0.9970，保留 193 条可疑地址）。
 
-![修复率](images/第2周/截图2_修复率.png)
 
 **图 2-3　分区裁剪生效（1,236 行 vs 14,398 行）**
 
 执行：`explain select count(*) from ydsh_dwd.dwd_order where order_month='2024-12';` 与不带 `where` 的同一查询
 画面要点：带分区条件时 `TableScan ... (rows=1236)`，不带时 `(rows=14398)`，扫描量下降 91.4%。
 
-![分区裁剪](images/第2周/截图3_分区裁剪.png)
 
 **图 2-4　分桶落盘与中文字段注释**
 
 执行：`describe formatted ydsh_dwd.dwd_order`
 画面要点：`Num Buckets: 8`、`Bucket Columns: [user_id]`、`numFiles: 96`（=12 分区×8 桶）、`orc.compress: snappy`，字段 comment 为中文。
 
-![分桶与注释](images/第2周/截图4_分桶与注释.png)
 
 **图 2-5　Git 提交记录（可追溯）**
 
 执行：`git log --oneline -10`
 画面要点：第 2 周的提交链，从清洗脚本到最终交付物，每条提交信息对应一个子任务。
-
-![Git 提交记录](images/第2周/截图5_git日志.png)
