@@ -66,4 +66,5 @@ services:
       # 按周分目录后，把两个周目录挂到容器 /repo 下，命令里用 /repo/第N周/sql/...
       - ./第1周:/repo/第1周:ro
       - ./第2周:/repo/第2周:ro
+      - ./第3周:/repo/第3周:ro
     restart: unless-stopped

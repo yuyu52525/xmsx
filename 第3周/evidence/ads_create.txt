@@ -1,0 +1,13 @@
++----------------------+
+|       tab_name       |
++----------------------+
+| ads_behavior_funnel  |
+| ads_category_rank    |
+| ads_channel_month    |
+| ads_kpi_month        |
+| ads_kpi_overview     |
+| ads_province_sales   |
+| ads_sales_daily      |
+| ads_store_rank       |
+| ads_user_rfm         |
++----------------------+

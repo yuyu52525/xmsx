@@ -1,0 +1,127 @@
++---------------------+
+|      tab_name       |
++---------------------+
+| dws_behavior_day    |
+| dws_category_month  |
+| dws_province_month  |
+| dws_sales_day       |
+| dws_sales_month     |
+| dws_sales_week      |
+| dws_store_month     |
+| dws_user_day        |
+| dws_user_month      |
++---------------------+
++-------------------------------+----------------------------------------------------+--------------------------------------------+
+|           col_name            |                     data_type                      |                  comment                   |
++-------------------------------+----------------------------------------------------+--------------------------------------------+
+| order_date                    | string                                             | 下单日期 yyyy-MM-dd                            |
+| channel_code                  | string                                             | 渠道编码（外键 -> dim_channel）                    |
+| channel_name                  | string                                             | 渠道名称：APP/PC官网/小程序/门店                       |
+| is_online                     | int                                                | 是否线上渠道（1 线上 / 0 线下）                        |
+| week_key                      | string                                             | 自然周 yyyy-Wnn（周一为起点，年内第几周，2024 年为 W01~W53）  |
+| day_of_week                   | int                                                | 星期几（周一=1）                                  |
+| is_weekend                    | int                                                | 是否周末（1 是 / 0 否）                            |
+| order_cnt                     | int                                                | 订单数（全部状态）                                  |
+| valid_order_cnt               | int                                                | 有效订单数（is_valid_revenue=1）                  |
+| gmv                           | double                                             | GMV = 当日该渠道全部订单实付金额合计                      |
+| valid_gmv                     | double                                             | 有效 GMV = 计入营收订单的实付金额合计                     |
+| discount_amount               | double                                             | 优惠金额合计                                     |
+| buyer_cnt                     | int                                                | 下单用户数（去重，非订单数）                             |
+| item_qty                      | int                                                | 销售件数（明细 quantity 合计，无明细订单记 0）              |
+| cancel_cnt                    | int                                                | 已取消订单数                                     |
+| refund_cnt                    | int                                                | 退款中订单数                                     |
+| aov                           | double                                             | 客单价 = gmv / order_cnt（元）                   |
+|                               | NULL                                               | NULL                                       |
+| # Partition Information       | NULL                                               | NULL                                       |
+| # col_name                    | data_type                                          | comment                                    |
+| stat_month                    | string                                             | 统计月份 yyyy-MM（分区键，= 下单月份）                   |
+|                               | NULL                                               | NULL                                       |
+| # Detailed Table Information  | NULL                                               | NULL                                       |
+| Database:                     | ydsh_dws                                           | NULL                                       |
+| OwnerType:                    | USER                                               | NULL                                       |
+| Owner:                        | hive                                               | NULL                                       |
+| CreateTime:                   | Mon Nov 09 01:10:07 UTC 2026                       | NULL                                       |
+| LastAccessTime:               | UNKNOWN                                            | NULL                                       |
+| Retention:                    | 0                                                  | NULL                                       |
+| Location:                     | file:/opt/hive/data/warehouse/ydsh_dws.db/dws_sales_day | NULL                                       |
+| Table Type:                   | EXTERNAL_TABLE                                     | NULL                                       |
+| Table Parameters:             | NULL                                               | NULL                                       |
+|                               | COLUMN_STATS_ACCURATE                              | {\"BASIC_STATS\":\"true\"}                 |
+|                               | EXTERNAL                                           | TRUE                                       |
+|                               | TRANSLATED_TO_EXTERNAL                             | TRUE                                       |
+|                               | bucketing_version                                  | 2                                          |
+|                               | external.table.purge                               | TRUE                                       |
+|                               | numFiles                                           | 0                                          |
+|                               | numPartitions                                      | 0                                          |
+|                               | numRows                                            | 0                                          |
+|                               | orc.compress                                       | snappy                                     |
+|                               | rawDataSize                                        | 0                                          |
+|                               | totalSize                                          | 0                                          |
+|                               | transient_lastDdlTime                              | 1794186607                                 |
+|                               | NULL                                               | NULL                                       |
+| # Storage Information         | NULL                                               | NULL                                       |
+| SerDe Library:                | org.apache.hadoop.hive.ql.io.orc.OrcSerde          | NULL                                       |
+| InputFormat:                  | org.apache.hadoop.hive.ql.io.orc.OrcInputFormat    | NULL                                       |
+| OutputFormat:                 | org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat   | NULL                                       |
+| Compressed:                   | No                                                 | NULL                                       |
+| Num Buckets:                  | -1                                                 | NULL                                       |
+| Bucket Columns:               | []                                                 | NULL                                       |
+| Sort Columns:                 | []                                                 | NULL                                       |
+| Storage Desc Params:          | NULL                                               | NULL                                       |
+|                               | serialization.format                               | 1                                          |
++-------------------------------+----------------------------------------------------+--------------------------------------------+
++-------------------------------+----------------------------------------------------+-----------------------------+
+|           col_name            |                     data_type                      |           comment           |
++-------------------------------+----------------------------------------------------+-----------------------------+
+| user_id                       | string                                             | 用户编号                        |
+| user_name                     | string                                             | 用户姓名                        |
+| member_level                  | string                                             | 会员等级名称                      |
+| level_rank                    | int                                                | 会员等级序号（1~4）                 |
+| province                      | string                                             | 用户所在省份                      |
+| order_cnt                     | int                                                | 本月订单数                       |
+| gmv                           | double                                             | 本月实付金额合计                    |
+| valid_gmv                     | double                                             | 本月有效 GMV                    |
+| first_order_date              | string                                             | 本月首单日期 yyyy-MM-dd           |
+| last_order_date               | string                                             | 本月末单日期 yyyy-MM-dd           |
+| avg_order_amt                 | double                                             | 本月客单价 = gmv / order_cnt（元）  |
+| cum_gmv                       | double                                             | 截至本月累计消费（元，按用户跨月累加）         |
+| is_repurchase                 | int                                                | 本月是否复购（本月订单数>=2 记 1）        |
+|                               | NULL                                               | NULL                        |
+| # Partition Information       | NULL                                               | NULL                        |
+| # col_name                    | data_type                                          | comment                     |
+| stat_month                    | string                                             | 统计月份 yyyy-MM                |
+|                               | NULL                                               | NULL                        |
+| # Detailed Table Information  | NULL                                               | NULL                        |
+| Database:                     | ydsh_dws                                           | NULL                        |
+| OwnerType:                    | USER                                               | NULL                        |
+| Owner:                        | hive                                               | NULL                        |
+| CreateTime:                   | Mon Nov 09 01:10:15 UTC 2026                       | NULL                        |
+| LastAccessTime:               | UNKNOWN                                            | NULL                        |
+| Retention:                    | 0                                                  | NULL                        |
+| Location:                     | file:/opt/hive/data/warehouse/ydsh_dws.db/dws_user_month | NULL                        |
+| Table Type:                   | EXTERNAL_TABLE                                     | NULL                        |
+| Table Parameters:             | NULL                                               | NULL                        |
+|                               | COLUMN_STATS_ACCURATE                              | {\"BASIC_STATS\":\"true\"}  |
+|                               | EXTERNAL                                           | TRUE                        |
+|                               | TRANSLATED_TO_EXTERNAL                             | TRUE                        |
+|                               | bucketing_version                                  | 2                           |
+|                               | external.table.purge                               | TRUE                        |
+|                               | numFiles                                           | 0                           |
+|                               | numPartitions                                      | 0                           |
+|                               | numRows                                            | 0                           |
+|                               | orc.compress                                       | snappy                      |
+|                               | rawDataSize                                        | 0                           |
+|                               | totalSize                                          | 0                           |
+|                               | transient_lastDdlTime                              | 1794186615                  |
+|                               | NULL                                               | NULL                        |
+| # Storage Information         | NULL                                               | NULL                        |
+| SerDe Library:                | org.apache.hadoop.hive.ql.io.orc.OrcSerde          | NULL                        |
+| InputFormat:                  | org.apache.hadoop.hive.ql.io.orc.OrcInputFormat    | NULL                        |
+| OutputFormat:                 | org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat   | NULL                        |
+| Compressed:                   | No                                                 | NULL                        |
+| Num Buckets:                  | -1                                                 | NULL                        |
+| Bucket Columns:               | []                                                 | NULL                        |
+| Sort Columns:                 | []                                                 | NULL                        |
+| Storage Desc Params:          | NULL                                               | NULL                        |
+|                               | serialization.format                               | 1                           |
++-------------------------------+----------------------------------------------------+-----------------------------+
