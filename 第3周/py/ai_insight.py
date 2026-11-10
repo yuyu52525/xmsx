@@ -62,6 +62,10 @@ def detect_anomalies(df: pd.DataFrame) -> pd.DataFrame:
     std = out["dev"].std()
     out["z"] = out["dev"] / std
     out["is_anomaly"] = out["z"].abs() >= 2
+    # 拆解波动来源：GMV = 订单量 × 客单价。
+    # 渠道归因只能回答"哪个渠道也降了"，回答不了"是没人买还是买得便宜"。
+    out["orders_idx"] = out["order_cnt"] / out["order_cnt"].mean()
+    out["aov_idx"] = out["aov"] / out["aov"].mean()
     return out
 
 
@@ -184,6 +188,23 @@ def build_markdown(anom: pd.DataFrame, attr_rows: list[dict], checks: list[dict]
         lines.append(f"| {r['order_date'].date()} | {r['weekday']} | {r['gmv']:,.2f} | "
                      f"{r['baseline']:,.2f} | {r['dev']*100:+.1f}% | {r['z']:.2f} |")
 
+    lines += ["", "### 1.3 波动来源拆解：是「量」还是「价」？", "",
+              "GMV = 订单量 × 客单价。把异常日拆成两个指数（100% = 全年日均水平），"
+              "才能判断是「人少了」还是「买得便宜」。", "",
+              "| 日期 | 类型 | GMV | 订单量 | 订单量指数 | 客单价 | 客单价指数 | 判定 |",
+              "|---|---|---|---|---|---|---|---|"]
+    all_anom = pd.concat([drops, spikes]).sort_values("order_date")
+    for _, r in all_anom.iterrows():
+        kind = "下滑" if r["z"] < 0 else "冲高"
+        oi, ai = r["orders_idx"], r["aov_idx"]
+        if kind == "下滑":
+            verdict = "量跌为主" if oi < 0.8 else ("价跌为主" if ai < 0.8 else "量价齐跌")
+        else:
+            verdict = "量涨为主" if oi > 1.15 else ("价涨为主" if ai > 1.15 else "量价齐涨")
+        lines.append(f"| {r['order_date'].date()} | {kind} | {r['gmv']:,.2f} | "
+                     f"{int(r['order_cnt'])} | {oi*100:.0f}% | {r['aov']:,.2f} | "
+                     f"{ai*100:.0f}% | **{verdict}** |")
+
     lines += ["", "## 二、最大下滑日归因", ""]
     for row in attr_rows:
         lines += [f"### {row['date']}（{row['weekday']}，GMV {row['gmv']:,.2f}，{row['dev']*100:+.1f}%）", "",
@@ -218,7 +239,7 @@ def build_markdown(anom: pd.DataFrame, attr_rows: list[dict], checks: list[dict]
             f"3. 三个指标存在口径边界：复购率恒为 100%、同比全空、漏斗购买率高于加购率，"
             f"汇报时不能直接当作结论使用。",
             "",
-            "> 说明：本段为模板生成（未调用大模型）。配置 DEEPSEEK_API_KEY 后执行 "
+            "> 说明：本段为模板生成（未调用大模型）。配置大模型 API Key 后执行 "
             "`python ai_insight.py --llm` 可得到模型撰写的版本。",
         ]
 
