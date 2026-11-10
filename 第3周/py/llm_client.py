@@ -32,6 +32,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 ENV_PATH = Path(__file__).resolve().parent / ".env"
+# 用量记账（本地文件，已在 .gitignore 中排除 *.log）
+USAGE_LOG = Path(__file__).resolve().parent.parent / "evidence" / "llm_usage.log"
 
 DEFAULT_BASE_URL = "https://api.deepseek.com"
 DEFAULT_MODEL = "deepseek-chat"
@@ -107,7 +109,53 @@ def chat(messages: list[dict], temperature: float = 0.2, max_tokens: int = 1024)
         temperature=temperature,
         max_tokens=max_tokens,
     )
+    _log_usage(resp)
     return resp.choices[0].message.content
+
+
+def _log_usage(resp) -> None:
+    """把每次调用的 token 用量追加到 evidence/llm_usage.log。
+
+    「免费」指的是不扣钱，不是不消耗 token——额度、QPS 限制依然存在。
+    记下来才能回答「跑一遍到底用多少」。
+    """
+    try:
+        from datetime import datetime
+
+        u = getattr(resp, "usage", None)
+        if u is None:
+            return
+        p = getattr(u, "prompt_tokens", 0) or 0
+        c = getattr(u, "completion_tokens", 0) or 0
+        t = getattr(u, "total_tokens", None) or (p + c)
+        USAGE_LOG.parent.mkdir(parents=True, exist_ok=True)
+        with USAGE_LOG.open("a", encoding="utf-8") as f:
+            f.write(f"{datetime.now():%Y-%m-%d %H:%M:%S}\t{model_name()}\t{p}\t{c}\t{t}\n")
+        print(f"  [用量] 输入 {p} + 输出 {c} = {t} tokens")
+    except Exception:  # noqa: BLE001  记账失败不影响主流程
+        pass
+
+
+def print_usage() -> None:
+    """汇总本地用量记录（不代表服务商账单，仅供估算）。"""
+    if not USAGE_LOG.exists():
+        print("暂无用量记录。跑一次 `python llm_client.py` 或 `python nl2sql.py \"问题\"` 后就有了。")
+        return
+    rows = [ln.split("\t") for ln in USAGE_LOG.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    tot_p = sum(int(r[2]) for r in rows if len(r) >= 5)
+    tot_c = sum(int(r[3]) for r in rows if len(r) >= 5)
+    print("=" * 56)
+    print("本地用量汇总（不完全等于服务商账单，仅供估算）")
+    print("=" * 56)
+    print(f"调用次数      : {len(rows)}")
+    print(f"累计输入      : {tot_p:,} tokens")
+    print(f"累计输出      : {tot_c:,} tokens")
+    print(f"累计合计      : {tot_p + tot_c:,} tokens")
+    print(f"明细文件      : {USAGE_LOG}")
+    print("\n最近 5 次：")
+    for r in rows[-5:]:
+        if len(r) >= 5:
+            print(f"  {r[0]}  {r[1]:<24} 入 {int(r[2]):>5}  出 {int(r[3]):>5}")
 
 
 def selftest() -> int:
@@ -170,6 +218,10 @@ def selftest() -> int:
 
 
 if __name__ == "__main__":
+    if "--usage" in sys.argv:
+        load_config()
+        print_usage()
+        raise SystemExit(0)
     if "--mask" in sys.argv:
         load_config()
         print(f"Key 已配置：{has_key()}　脱敏：{mask_key()}")
