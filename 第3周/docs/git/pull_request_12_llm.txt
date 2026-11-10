@@ -1,0 +1,20 @@
+﻿The following changes since commit 47919d1edaeb2ab75537320254dce49a611f6ba1:
+
+  feat(week3): DWS/ADS 九表建模、KPI 报表、GMV 预测与 NL2SQL 接口 (2026-11-09 09:40:23 +0800)
+
+are available in the Git repository at:
+
+  git@github.com:yuyu52525/xmsx.git feat/llm-multi-provider
+
+for you to fetch changes up to 5d23604875de86eb933e91ef41a586f098c61576:
+
+  refactor(llm): 配置改为多供应商通用，支持智谱/硅基流动/Ollama (2026-11-10 08:07:56 +0800)
+
+----------------------------------------------------------------
+余天乐 (1):
+      refactor(llm): 配置改为多供应商通用，支持智谱/硅基流动/Ollama
+
+ "\347\254\2543\345\221\250/py/.env.example"  |  50 +++++++++--
+ "\347\254\2543\345\221\250/py/llm_client.py" | 123 +++++++++++++++++++--------
+ "\347\254\2543\345\221\250/py/nl2sql.py"     |   7 +-
+ 3 files changed, 136 insertions(+), 44 deletions(-)

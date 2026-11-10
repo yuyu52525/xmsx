@@ -1,0 +1,21 @@
+﻿The following changes since commit 47919d1edaeb2ab75537320254dce49a611f6ba1:
+
+  feat(week3): DWS/ADS 九表建模、KPI 报表、GMV 预测与 NL2SQL 接口 (2026-11-09 09:40:23 +0800)
+
+are available in the Git repository at:
+
+  git@github.com:yuyu52525/xmsx.git feat/ai-insight
+
+for you to fetch changes up to cd471addc34e98fa6caa221270f454df4212d61b:
+
+  feat(insight): 增加量价拆解归因与 AI 反思文档 (2026-11-10 08:08:10 +0800)
+
+----------------------------------------------------------------
+余天乐 (1):
+      feat(insight): 增加量价拆解归因与 AI 反思文档
+
+ ...257\237\344\270\216\345\217\215\346\200\235.md" | 293 +++++++++++++++++++++
+ "\347\254\2543\345\221\250/evidence/ai_insight.md" |  15 +-
+ "\347\254\2543\345\221\250/py/ai_insight.py"       |  23 +-
+ 3 files changed, 329 insertions(+), 2 deletions(-)
+ create mode 100644 "\347\254\2543\345\221\250/docs/AI\346\231\272\350\203\275\346\264\236\345\257\237\344\270\216\345\217\215\346\200\235.md"

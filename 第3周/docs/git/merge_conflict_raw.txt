@@ -1,0 +1,15 @@
+<<<<<<< HEAD
+├── 第3周/                     # 第 3 周：DWS/ADS 建模 + KPI + 预测 + NL2SQL
+│   ├── sql/
+│   │   ├── dws/               # 建表、装载、校验
+│   │   └── ads/               # 建表、装载、校验、KPI 报表
+│   ├── py/                    # 预测建模、NL2SQL、AI 洞察
+│   ├── docs/
+│   └── evidence/
+=======
+├── 第3周/                     # 第 3 周（交付物见 第3周/docs/提交清单核对_第3周.md）
+>>>>>>> docs/readme-index
+└── README.md
+```
+
+## 五、环境启动
