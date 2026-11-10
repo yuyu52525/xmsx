@@ -235,9 +235,10 @@ def main() -> int:
 
     question = " ".join(args)
     if not has_key():
-        print("[错误] 未配置 DEEPSEEK_API_KEY，无法调用大模型。")
-        print("       1) 复制 py/.env.example 为 py/.env 并填入 Key；")
-        print("       2) 或先跑 `python nl2sql.py --demo` 看链路是否通。")
+        print("[错误] 未配置大模型 API Key（LLM_API_KEY / DEEPSEEK_API_KEY），无法调用模型。")
+        print("       1) 复制 py/.env.example 为 py/.env 并填入 Key（模板里有 4 种方案）；")
+        print("       2) 先跑 `python llm_client.py` 验证连通性；")
+        print("       3) 或不配 Key、直接跑 `python nl2sql.py --demo` 看链路是否通。")
         return 2
 
     sql, df = ask(question)

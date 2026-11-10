@@ -1,15 +1,26 @@
-"""第 3 周 · 大模型 API 最小可用调用 + 密钥管理
+"""第 3 周 · 大模型 API 调用 + 密钥管理（多供应商通用）
 
-设计要点：
-  1. Key 只从 .env / 环境变量读取，源码里不出现任何真实 Key；
-  2. 缺 Key 时抛 LLMNotConfigured，而不是静默返回空串——
-     让调用方明确知道"是没配 Key"，不是"模型返回为空"；
-  3. 提供 has_key() 供上层做降级判断；
-  4. selftest() 打印一次真实调用的请求/响应结构，用于验证连通性。
+为什么做成"通用"而不是写死 DeepSeek：
+  作业/答辩环境经常换 Key 来源（官方申请慢、免费额度到期、学校只给某家），
+  如果代码里写死 base_url 和模型名，换一家就要改代码。
+  这里统一成 3 个环境变量，任何 OpenAI 兼容服务都能直接用：
+
+      LLM_API_KEY    密钥
+      LLM_BASE_URL   接口地址
+      LLM_MODEL      模型名
+
+  同时兼容旧的 DEEPSEEK_* 变量名，老配置不用改。
+
+支持的常见供应商（都兼容 OpenAI 协议）：
+  - DeepSeek 官方   https://api.deepseek.com                          deepseek-chat
+  - 智谱 GLM        https://open.bigmodel.cn/api/paas/v4               glm-4-flash（免费）
+  - 硅基流动        https://api.siliconflow.cn/v1                      Qwen/Qwen2.5-7B-Instruct
+  - 阿里百炼        https://dashscope.aliyuncs.com/compatible-mode/v1  qwen-plus
+  - 本地 Ollama     http://localhost:11434/v1                          qwen2.5:7b
 
 用法：
-  python llm_client.py            # 连通性自检
-  python llm_client.py --mask     # 只看 Key 是否就位（不调用）
+  python llm_client.py            # 连通性自检（打印返回结构与 usage）
+  python llm_client.py --mask     # 只看 Key 是否就位，不调用
 """
 
 from __future__ import annotations
@@ -22,6 +33,9 @@ from dotenv import load_dotenv
 
 ENV_PATH = Path(__file__).resolve().parent / ".env"
 
+DEFAULT_BASE_URL = "https://api.deepseek.com"
+DEFAULT_MODEL = "deepseek-chat"
+
 
 class LLMNotConfigured(RuntimeError):
     """没有配置 API Key 时抛出。"""
@@ -32,14 +46,34 @@ def load_config() -> None:
     load_dotenv(ENV_PATH, override=False)
 
 
+def _pick(*names: str, default: str = "") -> str:
+    """按顺序取第一个非空环境变量，便于新旧变量名共存。"""
+    for name in names:
+        val = os.getenv(name, "").strip()
+        if val:
+            return val
+    return default
+
+
 def _api_key() -> str:
     load_config()
-    return os.getenv("DEEPSEEK_API_KEY", "").strip()
+    return _pick("LLM_API_KEY", "DEEPSEEK_API_KEY", "OPENAI_API_KEY", "ZHIPU_API_KEY")
+
+
+def base_url() -> str:
+    load_config()
+    return _pick("LLM_BASE_URL", "DEEPSEEK_BASE_URL", "OPENAI_BASE_URL",
+                 default=DEFAULT_BASE_URL)
+
+
+def model_name() -> str:
+    load_config()
+    return _pick("LLM_MODEL", "DEEPSEEK_MODEL", default=DEFAULT_MODEL)
 
 
 def has_key() -> bool:
     key = _api_key()
-    return bool(key) and not key.startswith("sk-your")
+    return bool(key) and not key.startswith(("sk-your", "your-", "<"))
 
 
 def mask_key(key: str | None = None) -> str:
@@ -53,28 +87,22 @@ def mask_key(key: str | None = None) -> str:
 
 
 def get_client():
-    """构造 OpenAI 兼容客户端（DeepSeek）。"""
+    """构造 OpenAI 兼容客户端。本地 Ollama 不需要真 Key，传占位串即可。"""
     if not has_key():
         raise LLMNotConfigured(
-            f"未找到可用的 DEEPSEEK_API_KEY。\n"
+            f"未找到可用的 API Key（LLM_API_KEY / DEEPSEEK_API_KEY）。\n"
             f"请复制 {ENV_PATH.parent / '.env.example'} 为 .env 并填入真实 Key。"
         )
     from openai import OpenAI
 
-    load_config()
-    return OpenAI(
-        api_key=_api_key(),
-        base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
-        timeout=60,
-    )
+    return OpenAI(api_key=_api_key(), base_url=base_url(), timeout=60)
 
 
 def chat(messages: list[dict], temperature: float = 0.2, max_tokens: int = 1024) -> str:
     """发一次对话请求，返回纯文本。messages 为 OpenAI 格式。"""
     client = get_client()
-    model = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
     resp = client.chat.completions.create(
-        model=model,
+        model=model_name(),
         messages=messages,
         temperature=temperature,
         max_tokens=max_tokens,
@@ -83,24 +111,49 @@ def chat(messages: list[dict], temperature: float = 0.2, max_tokens: int = 1024)
 
 
 def selftest() -> int:
-    """最小化连通性验证：一次调用 + 返回格式检查。"""
-    print("=" * 52)
+    """最小化连通性验证：一次调用 + 返回格式检查 + 常见错误码提示。"""
+    print("=" * 56)
     print("大模型 API 连通性自检")
-    print("=" * 52)
-    print(f".env 路径      : {ENV_PATH}  ({'存在' if ENV_PATH.exists() else '不存在'})")
-    print(f"DEEPSEEK_API_KEY: {mask_key()}")
-    print(f"DEEPSEEK_MODEL  : {os.getenv('DEEPSEEK_MODEL', 'deepseek-chat')}")
+    print("=" * 56)
+    print(f".env 路径   : {ENV_PATH}  ({'存在' if ENV_PATH.exists() else '不存在'})")
+    print(f"API Key     : {mask_key()}")
+    print(f"Base URL    : {base_url()}")
+    print(f"模型        : {model_name()}")
+
     if not has_key():
         print("\n[结论] 未配置 Key，跳过真实调用。")
         print("       复制 .env.example 为 .env 并填写 Key 后重跑本脚本。")
         return 2
 
-    resp = get_client().chat.completions.create(
-        model=os.getenv("DEEPSEEK_MODEL", "deepseek-chat"),
-        messages=[{"role": "user", "content": "只回复两个字：连通"}],
-        temperature=0,
-        max_tokens=16,
-    )
+    from openai import (APIConnectionError, APIStatusError, AuthenticationError,
+                        NotFoundError, RateLimitError)
+
+    try:
+        client = get_client()
+        resp = client.chat.completions.create(
+            model=model_name(),
+            messages=[{"role": "user", "content": "只回复两个字：连通"}],
+            temperature=0,
+            max_tokens=16,
+        )
+    except AuthenticationError:
+        print("\n[结论] 认证失败（401）：Key 不对、已失效，或与当前 Base URL 不匹配。")
+        return 1
+    except NotFoundError:
+        print(f"\n[结论] 模型不存在（404）：LLM_MODEL={model_name()!r} 在这家供应商下不可用，"
+              f"请核对模型名。")
+        return 1
+    except RateLimitError as exc:
+        print(f"\n[结论] 被限流或额度用尽（429）：{exc}")
+        return 1
+    except APIConnectionError as exc:
+        print(f"\n[结论] 连不上 {base_url()}：{exc}\n"
+              f"       本地 Ollama 请确认已 `ollama serve`；云端请检查网络/代理。")
+        return 1
+    except APIStatusError as exc:
+        print(f"\n[结论] 服务端返回 {exc.status_code}：{exc.message}")
+        return 1
+
     content = resp.choices[0].message.content
     print("\n--- 返回结构 ---")
     print(f"id      : {resp.id}")
@@ -108,7 +161,9 @@ def selftest() -> int:
     print(f"choices : {len(resp.choices)} 个")
     print(f"finish  : {resp.choices[0].finish_reason}")
     print(f"内容    : {content!r}")
-    print(f"usage   : prompt={resp.usage.prompt_tokens} completion={resp.usage.completion_tokens}")
+    if resp.usage:
+        print(f"usage   : prompt={resp.usage.prompt_tokens} "
+              f"completion={resp.usage.completion_tokens}")
     ok = isinstance(content, str) and len(content) > 0
     print(f"\n[结论] {'连通正常，返回格式符合预期' if ok else '返回内容为空，需检查模型名/额度'}")
     return 0 if ok else 1
