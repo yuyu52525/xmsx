@@ -1,0 +1,50 @@
+﻿
+======================================================================
+提问：广东省2024年12月的销售额是多少？
+======================================================================
+
+生成 SQL：
+  select cast(round(sum(gmv), 2) as decimal(18, 2)) as gmv
+  from ydsh_ads.ads_province_sales
+  where province = '广东省' and stat_month = '2024-12'
+  limit 200
+
+命中 1 行：
+      gmv
+171556.38
+======================================================================
+提问：2024年各品类销量前5名是哪些？
+======================================================================
+
+生成 SQL：
+  SELECT category, SUM(item_qty) AS total_qty
+  FROM ydsh_ads.ads_category_rank
+  WHERE stat_month BETWEEN '2024-01' AND '2024-12'
+  GROUP BY category
+  ORDER BY total_qty DESC
+  LIMIT 5
+
+命中 5 行：
+category  total_qty
+    运动户外      15790
+    数码家电      14650
+    图书文娱      13227
+    服饰鞋包      13170
+    食品生鲜      13027
+======================================================================
+提问：2024年12月各渠道的GMV占比
+======================================================================
+
+生成 SQL：
+  SELECT channel_name, cast(round(gmv_share, 2) as decimal(18, 2)) as gmv_share
+  FROM ydsh_ads.ads_channel_month
+  WHERE stat_month = '2024-12'
+  ORDER BY gmv_share DESC
+  LIMIT 200
+
+命中 4 行：
+channel_name gmv_share
+         小程序      0.27
+          门店      0.25
+         APP      0.25
+        PC官网      0.24

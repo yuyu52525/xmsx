@@ -20,3 +20,6 @@ node_modules/
 .vscode/
 *.pyc
 .DS_Store
+
+# 大模型申请教程仅本地保留，不推送
+第3周/docs/大模型API申请与配置教程.*

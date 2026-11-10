@@ -246,6 +246,17 @@ def build_markdown(anom: pd.DataFrame, attr_rows: list[dict], checks: list[dict]
     return "\n".join(lines)
 
 
+def _volume_price_verdict(orders_idx: float, aov_idx: float) -> str:
+    """量价判定。放在代码里而不是提示词里：模型做比较逻辑实测会出错。"""
+    if orders_idx < 0.8 and aov_idx < 0.8:
+        return "量价齐跌"
+    if orders_idx < 0.8:
+        return "量跌为主"
+    if aov_idx < 0.8:
+        return "价跌为主"
+    return "量价均正常"
+
+
 def llm_summary(payload: dict) -> str | None:
     """调大模型写经营摘要；没 Key 返回 None。"""
     from llm_client import chat, has_key
@@ -254,8 +265,19 @@ def llm_summary(payload: dict) -> str | None:
         return None
     prompt = (
         "你是一名零售数据分析师。下面是一份日 GMV 异常检测结果，"
-        "请用 150 字以内写一段经营分析摘要，要求：只引用给定数字，不要编造；"
-        "指出最值得关注的一天；给出一条可执行的建议。\n\n"
+        "请用 180 字以内写一段经营分析摘要。\n\n"
+        "硬性约束（违反任何一条即为不合格）：\n"
+        "1. 只能引用 JSON 里出现的数字，不得编造任何数字。\n"
+        "2. 每一天的 verdict 字段已由程序判定好（量跌为主/价跌为主/量价齐跌），"
+        "必须直接采用，禁止自行重新判断或改写归类。摘要里必须点明属于哪一类，"
+        "并引用对应的 orders_idx 与 aov_idx 数字作为依据。\n"
+        "3. 不得推测数据里没有的原因。JSON 中没有系统故障、天气、竞品、促销、"
+        "节假日等任何字段，因此禁止出现这些归因；只能说「数据无法解释原因」。\n"
+        "4. 看 channels：若四个渠道的 share 都不是压倒性的（绝对值均<0.6），"
+        "必须表述为「全渠道同步收缩」，禁止把降幅最大的那个渠道说成「主要原因」。\n"
+        "5. 给出 1 条可执行建议，且建议必须对应第 2 条判定的性质"
+        "（量跌→查流量与投放；价跌→查优惠与品类结构）。\n\n"
+        "输出格式：先一句话结论（含日期、性质、量价指数），再一句建议。不要写标题。\n\n"
         + json.dumps(payload, ensure_ascii=False, indent=2)
     )
     return chat([{"role": "user", "content": prompt}], temperature=0.3, max_tokens=400)
@@ -287,6 +309,14 @@ def main() -> None:
             "weekday": r["weekday"],
             "gmv": round(float(r["gmv"]), 2),
             "dev": round(float(r["dev"]), 4),
+            # 量价拆解：模型必须先看这两个指数，才能判断是「量跌」还是「价跌」
+            "order_cnt": int(r["order_cnt"]),
+            "orders_idx": round(float(r["orders_idx"]), 3),
+            "aov": round(float(r["aov"]), 2),
+            "aov_idx": round(float(r["aov_idx"]), 3),
+            # 判定由代码算好再交给模型，不让模型自己做比较逻辑：
+            # 实测模型会把「订单量 0.94 / 客单价 0.67」错判成量价齐跌。
+            "verdict": _volume_price_verdict(r["orders_idx"], r["aov_idx"]),
             "channels": [
                 {"channel": row["channel"], "gmv": round(float(row["gmv"]), 2),
                  "baseline": round(float(row["avg_gmv"]), 2),

@@ -174,28 +174,40 @@ SQL：select category, sum(item_qty) as total_qty
 
 ## 七、测试结果
 
-### 7.1 链路验证方式（重要说明）
+### 7.1 链路验证方式
 
-**当前环境没有配置大模型 API Key**，因此第 ③ 步（真实调用模型）**未能端到端验证**。为不阻塞其余环节的验证，`nl2sql.py` 提供了两种模式：
+**已配置真实 Key（智谱 GLM-4-Flash，`glm-4-flash-250414`），第 ③ 步模型生成已端到端验证通过。**
 
-| 模式 | 命令 | 验证了什么 | 没验证什么 |
-|---|---|---|---|
-| `--demo` | `python nl2sql.py --demo` | ①Schema 抽取 ⑤清洗 ⑥校验 ⑦执行 全通 | **③模型生成**（用预置 SQL 代替） |
-| 真实模式 | `python nl2sql.py "问题"` | 全链路 | 需先配 Key |
+`nl2sql.py` 提供两种模式：
 
-`--demo` 模式在输出开头就明确打印"生成的 SQL 是人工预置的参考答案，不是大模型输出"，**不冒充模型结果**。
+| 模式 | 命令 | 说明 |
+|---|---|---|
+| 真实模式 | `python nl2sql.py "问题"` | 全链路：模型生成 → 清洗 → 校验 → 执行，**已实测** |
+| `--demo` | `python nl2sql.py --demo` | 无 Key 时的降级方案，用预置 SQL 跑通其余环节；输出开头明确声明"不是大模型输出" |
 
-填入 Key 后的验证方式：
+自检输出（`evidence/llm_selftest.txt`）：
 
-```powershell
-copy .env.example .env      # 然后把 DEEPSEEK_API_KEY 改成真实 Key
-python llm_client.py        # 先验证连通性（会打印 usage 与 finish_reason）
-python nl2sql.py "广东省上月销售额是多少？"
+```
+API Key     : f1fef8...yGpM
+模型        : glm-4-flash-250414
+内容        : '连通'
+usage       : prompt=10 completion=3
+[结论] 连通正常，返回格式符合预期
 ```
 
-`llm_client.py` 的自检会打印 `id / model / finish_reason / usage`，能区分"Key 错"、"模型名错"、"额度耗尽"三种情况，不用盲猜。
+### 7.2 真实模型实测结果（3 个提问，全部正确）
 
-### 7.2 五个测试用例（`--demo` 实测结果）
+完整记录见 `evidence/nl2sql_llm_live.txt`。
+
+| # | 提问 | 模型生成的 SQL（要点） | 返回结果 | 是否正确 |
+|---|---|---|---|---|
+| 1 | 广东省2024年12月的销售额是多少？ | `select cast(round(sum(gmv),2) ...) from ydsh_ads.ads_province_sales where province='广东省' and stat_month='2024-12'` | **171,556.38 元** | ✅ 与人工 SQL 一致 |
+| 2 | 2024年各品类销量前5名是哪些？ | `... where stat_month between '2024-01' and '2024-12' group by category order by total_qty desc limit 5` | 运动户外 15,790 / 数码家电 14,650 / 图书文娱 13,227 / 服饰鞋包 13,170 / 食品生鲜 13,027 | ✅ 完全一致 |
+| 3 | 2024年12月各渠道的GMV占比 | `select channel_name, gmv_share from ydsh_ads.ads_channel_month where stat_month='2024-12' order by gmv_share desc` | 小程序 27% / 门店 25% / APP 25% / PC官网 24% | ✅ 一致（模型自己找对了 `gmv_share` 字段，没有去现算） |
+
+**三个提问一次通过，模型没有编造表名或字段名，也没有写出被 `guard_sql` 拦截的语句。** 第 1 题的聚合写法（先 `sum` 再 `round`）比人工更严谨一点。
+
+### 7.3 `--demo` 五个测试用例（预置 SQL，无 Key 时的降级验证）
 
 | # | 问题 | 生成的 SQL（要点） | 返回结果 |
 |---|---|---|---|
@@ -207,7 +219,7 @@ python nl2sql.py "广东省上月销售额是多少？"
 
 全部命中，无 SQL 报错。第 3 题的结果与 `KPI指标结果表.md` 第二节 2024-12 行完全一致（3,111,746.74 / 1,236 / 2,517.59），说明 NL2SQL 取数与人工写 SQL 口径一致。
 
-### 7.3 一个值得注意的模糊问题
+### 7.4 一个值得注意的模糊问题
 
 第 4 题"哪个省的人均消费（ARPU）最高"，示例用了 `avg(arpu)`（对 12 个月的月 ARPU 再平均），得到上海市 4,440.43。但也可以理解为"该省全年 GMV ÷ 该省全年买家数"，结果会不同。
 

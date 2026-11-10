@@ -27,6 +27,11 @@
       "weekday": "周六",
       "gmv": 50273.3,
       "dev": -0.4877,
+      "order_cnt": 22,
+      "orders_idx": 0.559,
+      "aov": 2285.15,
+      "aov_idx": 0.911,
+      "verdict": "量跌为主",
       "channels": [
         {
           "channel": "APP",
@@ -97,6 +102,11 @@
       "weekday": "周日",
       "gmv": 55713.6,
       "dev": -0.451,
+      "order_cnt": 22,
+      "orders_idx": 0.559,
+      "aov": 2532.44,
+      "aov_idx": 1.01,
+      "verdict": "量跌为主",
       "channels": [
         {
           "channel": "APP",
@@ -167,6 +177,11 @@
       "weekday": "周二",
       "gmv": 61767.79,
       "dev": -0.3936,
+      "order_cnt": 37,
+      "orders_idx": 0.941,
+      "aov": 1669.4,
+      "aov_idx": 0.666,
+      "verdict": "价跌为主",
       "channels": [
         {
           "channel": "APP",
