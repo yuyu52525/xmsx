@@ -74,7 +74,7 @@
 │   │   ├── dws/               # 建表、装载、校验
 │   │   └── ads/               # 建表、装载、校验、KPI 报表
 │   ├── py/                    # 预测建模、NL2SQL、AI 洞察
-│   ├── docs/
+│   ├── docs/                  # 含提交清单核对_第3周.md、git/ 协同记录
 │   └── evidence/
 └── README.md
 ```
