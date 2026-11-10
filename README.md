@@ -69,6 +69,13 @@
 │   │   └── images/            # 架构图 2 张 + 证据图 6 张 + 实拍截图 4 张
 │   ├── evidence/              # 全部 SQL 的真实运行输出（可复核）
 │   └── 第2周_AI协同日志.md
+├── 第3周/                     # 第 3 周：DWS/ADS 建模 + KPI + 预测 + NL2SQL
+│   ├── sql/
+│   │   ├── dws/               # 建表、装载、校验
+│   │   └── ads/               # 建表、装载、校验、KPI 报表
+│   ├── py/                    # 预测建模、NL2SQL、AI 洞察
+│   ├── docs/
+│   └── evidence/
 └── README.md
 ```
 
