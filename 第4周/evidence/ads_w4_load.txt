@@ -1,0 +1,39 @@
+==============================================================================
+SQL 脚本执行：D:\xiangmushixun-bde\第4周\sql\ads\load_ads_w4.sql
+连接：Hive localhost:10000  库：ydsh_ads
+语句数：8    开始时间：2026-11-17 08:25:44
+==============================================================================
+
+[1/8] use ydsh_ads
+  -> OK  (0.02s)
+
+[2/8] set hive.auto.convert.join = true
+  -> OK  (0.01s)
+
+[3/8] set hive.mapjoin.smalltable.filesize = 25000000
+  -> OK  (0.01s)
+
+[4/8] set hive.exec.parallel = false
+  -> OK  (0.01s)
+
+[5/8] insert overwrite table ads_pay_type_month select t.stat_month, t.pay_code, t.pay_name, t.order_cnt, t.buyer_cnt, t.gmv, t.valid_gmv, round(t.gmv / t.o ...
+  -> OK  (24.79s)
+
+[6/8] insert overwrite table ads_hour_category select h.hour_of_day, h.category, h.order_cnt, h.item_qty, h.buyer_cnt, h.sales_amt, h.avg_item_price, cast(r ...
+  -> OK  (27.80s)
+
+[7/8] select count(1) as ads_pay_type_month from ads_pay_type_month
+  -> 1 行  (0.89s)
+  ads_pay_type_month
+  ------------------
+  48                
+
+[8/8] select count(1) as ads_hour_category   from ads_hour_category
+  -> 1 行  (0.89s)
+  ads_hour_category
+  -----------------
+  192              
+
+==============================================================================
+汇总：成功 8 条，失败 0 条，总耗时 54.5s
+==============================================================================

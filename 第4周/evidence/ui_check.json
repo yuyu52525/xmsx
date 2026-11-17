@@ -1,0 +1,148 @@
+{
+  "screen": {
+    "viewport": "1920x1080",
+    "stage": "1920x1080 @ 0,0",
+    "status": "接口 拉取完成 · 后端 clickhouse · 261.6 ms",
+    "backendPill": "数据源 · ClickHouse",
+    "kpiCount": 6,
+    "kpis": [
+      {
+        "label": "GMV（订单口径）",
+        "value": "3611.7 万元",
+        "overflow": 0
+      },
+      {
+        "label": "有效营收占比",
+        "value": "66.96%",
+        "overflow": 0
+      },
+      {
+        "label": "订单量",
+        "value": "14,398笔",
+        "overflow": 0
+      },
+      {
+        "label": "客单价 AOV",
+        "value": "2,508元",
+        "overflow": 0
+      },
+      {
+        "label": "ARPU",
+        "value": "36,117元/人",
+        "overflow": 0
+      },
+      {
+        "label": "取消 / 退款",
+        "value": "13.9% / 5.4%",
+        "overflow": 0
+      }
+    ],
+    "rankItems": 8,
+    "panels": [
+      {
+        "cls": "area-line",
+        "x": 24,
+        "y": 234,
+        "w": 616,
+        "h": 454,
+        "canvasCount": 1,
+        "canvasPx": "1172x802",
+        "overflowY": 0,
+        "overflowX": 0
+      },
+      {
+        "cls": "area-map",
+        "x": 652,
+        "y": 234,
+        "w": 773,
+        "h": 454,
+        "canvasCount": 1,
+        "canvasPx": "1486x802",
+        "overflowY": 0,
+        "overflowX": 0
+      },
+      {
+        "cls": "area-bar",
+        "x": 1437,
+        "y": 234,
+        "w": 459,
+        "h": 454,
+        "canvasCount": 1,
+        "canvasPx": "858x802",
+        "overflowY": 0,
+        "overflowX": 0
+      },
+      {
+        "cls": "area-heat",
+        "x": 24,
+        "y": 700,
+        "w": 773,
+        "h": 328,
+        "canvasCount": 1,
+        "canvasPx": "1486x550",
+        "overflowY": 0,
+        "overflowX": 0
+      },
+      {
+        "cls": "area-scatter",
+        "x": 809,
+        "y": 700,
+        "w": 459,
+        "h": 328,
+        "canvasCount": 1,
+        "canvasPx": "858x550",
+        "overflowY": 0,
+        "overflowX": 0
+      },
+      {
+        "cls": "area-pie",
+        "x": 1280,
+        "y": 700,
+        "w": 302,
+        "h": 328,
+        "canvasCount": 1,
+        "canvasPx": "544x550",
+        "overflowY": 0,
+        "overflowX": 0
+      },
+      {
+        "cls": "area-rank",
+        "x": 1594,
+        "y": 700,
+        "w": 302,
+        "h": 328,
+        "canvasCount": 0,
+        "canvasPx": null,
+        "overflowY": 0,
+        "overflowX": 0
+      }
+    ],
+    "overlaps": [],
+    "chartsWithoutCanvas": [
+      "area-rank"
+    ],
+    "ok": true
+  },
+  "streamlit": {
+    "question": "各支付方式的销售额占比是多少？",
+    "has_question": true,
+    "has_sql": true,
+    "has_chart_tab": true,
+    "has_table_tab": true,
+    "has_error": false,
+    "chars": 260,
+    "ok": true,
+    "excerpt": "🐳 云购生活 · 智能经营问答\n\n自然语言 → SQL → Hive 执行 → 表格与图表 ｜ 数据源：ydsh_ads（11 张 ADS 应用层表）｜ 只读校验：仅允许 SELECT / WITH，自动补 LIMIT 200\n\nPress Enter to submit form\n\n提问 ⏎\n\n共 1 轮对话（最新在上）\n\n🙋 各支付方式的销售额占比是多少？\n\nLLM执行 28.24s4 行\n\n生成的 SQL（已通过只读校验）\n\n📊 图表\n\n📋 数据表\n\n图表类型\n\n自动\n\n折线\n\n柱状\n\n饼图\n\n散点\n\n仅表格"
+  },
+  "superset": {
+    "logged_in": true,
+    "chart_holders": 6,
+    "canvas": 3,
+    "svg": 21,
+    "error_lines": [],
+    "has_dashboard_title": true,
+    "chars": 606,
+    "ok": true,
+    "excerpt": "DashboardsChartsDatasets\nSQL\n设置\n过滤\nADD/EDIT FILTERS\n月份\n12 options\n品类\n8 options\n支付方式\n4 options\nAPPLY FILTERS\n清除所有\n云购生活 · 经营分析仪表板\n云购生活 · 经营分析仪表板\n已发布\nAdmin User\n29 minutes ago\n编辑看板\n① 全年 GMV（指标卡）\n36.1M\n订单口径 · 2024 全年\n② 月度销售趋势（折线）\n③ 品类销售额（柱状）\n④ 省份销售分布（地图）\n⑤ 支付方式占比（饼图）\n⑥ 门店 GMV TopN（排行表）\nstore_name\n\t\nGMV\n\t\n订单量\n\t\n坪效\n云购生活·北京二店\t\n1.32M\t\n533\t\n6.32k\n云购生活·开封社区店\t\n1.3M\t\n496\t\n5.08k\n云购生活·莆田旗舰店\t\n1.23M\t\n467\t\n6.47k\n云购生活·青岛二店\t\n1.23M\t\n507\t\n3.46k\n云购生活·德阳购物中心店\t\n1.23M\t\n501\t\n3.22k\n云购生活·重庆社区店\t\n1.21M\t\n469\t\n3.03k\n云购生活·重庆一店\t\n1.18M\t\n484\t\n4.44k\n云购生活·西安一店\t\n1.12M\t\n463\t\n4.75k\n云购生活·绍兴旗舰店\t\n702k\t\n257\t\n1.44k\n云购生活·合肥购物中心店\t\n687k\t\n262\t\n1.2k"
+  }
+}

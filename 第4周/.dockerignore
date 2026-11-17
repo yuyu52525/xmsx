@@ -1,0 +1,6 @@
+# 构建上下文瘦身：docs（含截图）、evidence（运行输出）、缓存都不进镜像
+docs/
+evidence/
+**/__pycache__/
+**/*.pyc
+stress/results/

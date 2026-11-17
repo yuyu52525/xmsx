@@ -1,13 +1,35 @@
+# ============================================================================
+# 云购生活数仓 · 第 4 周 —— 多服务一键部署编排
+# ----------------------------------------------------------------------------
+# 服务清单（8 个）：
+#   mysql            元数据库（Hive Metastore + Superset 元数据）
+#   hive-metastore   元数据服务
+#   hive-server      HiveServer2（数仓主数据源：ydsh_ods/dwd/dws/ads）
+#   clickhouse       服务层缓存（ADS 结果集副本，压测对比 + 大屏高频读取）
+#   superset         BI 可视化（仪表板）
+#   superset-init    一次性初始化（建数据源/数据集/图表/仪表板后退出）
+#   api              数据服务（JSON 接口 + 托管 ECharts 大屏静态页）
+#   app              Streamlit 对话式问答（NL2SQL 闭环）
+#
+# 启动：docker compose up -d        停止：docker compose down
+# 密钥：全部走仓库根目录 .env（该文件不进 Git），本文件只写 ${VAR} 引用
+#
+# 启动顺序由 depends_on + healthcheck 保证：
+#   mysql(healthy) → hive-metastore(healthy) → hive-server(healthy) → superset(healthy) → superset-init
+#   clickhouse(healthy) → api → app
+# ============================================================================
+
 services:
 
+  # ------------------------------------------------------------------ 元数据库
   mysql:
     image: docker.1panel.live/library/mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: metastore
-      MYSQL_USER: hive
-      MYSQL_PASSWORD: hive
+      MYSQL_USER: ${MYSQL_USER:-hive}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-hive}
       TZ: Asia/Shanghai
     command:
       - --character-set-server=utf8mb4
@@ -18,13 +40,41 @@ services:
     volumes:
       - ./data/mysql:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-root}"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
     restart: unless-stopped
+    networks: [ydsh]
 
+  # -------------------------------------------------- MySQL 业务库/元数据库初始化
+  # 为什么单独一个服务：MySQL 官方镜像的 MYSQL_DATABASE 只能建一个库，
+  # 而我们需要 metastore（Hive）+ superset_meta（Superset 元数据）+ ydsh_mysql（业务库）。
+  # 数据卷已存在时 /docker-entrypoint-initdb.d 不会重跑，所以用一次性服务保证每次都执行，
+  # 语句全是 IF NOT EXISTS，幂等。
+  mysql-init:
+    image: docker.1panel.live/library/mysql:8.0
+    container_name: mysql-init
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_PWD: ${MYSQL_ROOT_PASSWORD:-root}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        mysql -h mysql -uroot -e
+        "CREATE DATABASE IF NOT EXISTS superset_meta DEFAULT CHARACTER SET utf8mb4;
+         CREATE DATABASE IF NOT EXISTS ydsh_mysql DEFAULT CHARACTER SET utf8mb4;
+         CREATE USER IF NOT EXISTS 'ydsh_ro'@'%' IDENTIFIED BY '${MYSQL_RO_PASSWORD:-ydsh_ro_2024}';
+         GRANT SELECT ON ydsh_mysql.* TO 'ydsh_ro'@'%';
+         FLUSH PRIVILEGES;
+         SHOW DATABASES;"
+    restart: "no"
+    networks: [ydsh]
+
+  # ------------------------------------------------------------ Hive 元数据服务
   hive-metastore:
     image: apache/hive:4.0.0
     container_name: hive-metastore
@@ -37,34 +87,242 @@ services:
       SERVICE_OPTS: >-
         -Djavax.jdo.option.ConnectionDriverName=com.mysql.cj.jdbc.Driver
         -Djavax.jdo.option.ConnectionURL=jdbc:mysql://mysql:3306/metastore?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
-        -Djavax.jdo.option.ConnectionUserName=hive
-        -Djavax.jdo.option.ConnectionPassword=hive
+        -Djavax.jdo.option.ConnectionUserName=${MYSQL_USER:-hive}
+        -Djavax.jdo.option.ConnectionPassword=${MYSQL_PASSWORD:-hive}
         -Dhive.metastore.warehouse.dir=/opt/hive/data/warehouse
     ports:
       - "9083:9083"
     volumes:
       - ./lib/mysql-connector-j-8.0.33.jar:/opt/hive/lib/mysql-connector-j-8.0.33.jar:ro
       - ./data/warehouse:/opt/hive/data/warehouse
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/9083' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
     restart: unless-stopped
+    networks: [ydsh]
 
+  # ---------------------------------------------------------------- HiveServer2
   hive-server:
     image: apache/hive:4.0.0
     container_name: hive-server
     depends_on:
-      - hive-metastore
+      hive-metastore:
+        condition: service_healthy
     environment:
       SERVICE_NAME: hiveserver2
       SERVICE_OPTS: >-
         -Dhive.metastore.uris=thrift://hive-metastore:9083
         -Dhive.server2.enable.doAs=false
+        -Dhive.server2.thrift.http.path=cliservice
     ports:
       - "10000:10000"
       - "10002:10002"
     volumes:
       - ./data/warehouse:/opt/hive/data/warehouse
       - ./data/csv:/data
-      # 按周分目录后，把两个周目录挂到容器 /repo 下，命令里用 /repo/第N周/sql/...
+      # 各周脚本目录挂进容器，容器内路径固定为 /repo/第N周/...
       - ./第1周:/repo/第1周:ro
       - ./第2周:/repo/第2周:ro
       - ./第3周:/repo/第3周:ro
+      - ./第4周:/repo/第4周:ro
+    healthcheck:
+      # HiveServer2 没有轻量 HTTP 探针，用端口可连性判断；
+      # start_period 给足 120s，冷启动时 beeline 客户端会先报错，不然后续服务会抢跑
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/10000' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
     restart: unless-stopped
+    networks: [ydsh]
+
+  # ------------------------------------------------------------------ ClickHouse
+  # 定位：服务层缓存。ADB 层的 ADS 结果集复制一份到这里，
+  #       用于大屏高频刷新（Hive 一条查询 1~25s，CH 10~50ms）与压测对比。
+  #       不承担 ETL，不改口径；口径变了重跑 py/export_to_clickhouse.py 即可。
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    container_name: clickhouse
+    environment:
+      CLICKHOUSE_DB: ydsh_ads
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-ydsh}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-ydsh123}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+      TZ: Asia/Shanghai
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      # 必须用"命名卷"，不能用 ./data/clickhouse 绑定挂载：
+      # CH 往 /var/lib/clickhouse/store 里 rename 分区目录时，
+      # 在 Windows 的 bind mount 上会报 Permission denied（实测 code 1001），
+      # 数据一点都写不进去。命名卷由 Docker 自己管理文件系统，没这个问题。
+      - clickhouse_data:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD-SHELL", "clickhouse-client --user ${CLICKHOUSE_USER:-ydsh} --password ${CLICKHOUSE_PASSWORD:-ydsh123} --query 'select 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+    restart: unless-stopped
+    networks: [ydsh]
+
+  # -------------------------------------------------------------------- Superset
+  superset:
+    build:
+      context: ./第4周/docker/superset
+      dockerfile: Dockerfile
+    image: ydsh/superset:4.1.2
+    container_name: superset
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mysql-init:
+        condition: service_completed_successfully
+      hive-server:
+        condition: service_healthy
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:?必须在 .env 里设置 SUPERSET_SECRET_KEY}
+      SUPERSET_METADATA_URI: mysql+pymysql://root:${MYSQL_ROOT_PASSWORD:-root}@mysql:3306/superset_meta?charset=utf8mb4
+      SUPERSET_PORT: 8088
+      SUPERSET_BIND_ADDRESS: 0.0.0.0
+      GUNICORN_TIMEOUT: 180
+      SERVER_WORKER_AMOUNT: 1
+      SERVER_THREADS_AMOUNT: 20
+      ADMIN_USERNAME: ${SUPERSET_ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:-admin}
+      ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@ydsh.local}
+      PYTHONPATH: /app/pythonpath
+    # 首次启动：建元数据表 → 建管理员（幂等）→ 初始化默认角色权限 → 起服务
+    # 注意：不要在这里用 `superset fab create-admin`，它会把参数当成交互式输入，
+    #       容器日志只留下 `Username [admin]:` 然后启动失败（实测）。改用 create_admin.py。
+    command: >
+      /bin/sh -c "superset db upgrade &&
+      python /app/create_admin.py &&
+      superset init &&
+      /usr/bin/run-server.sh"
+    ports:
+      - "8088:8088"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8088/health', timeout=5).status==200 else 1)\""]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+      start_period: 120s
+    restart: unless-stopped
+    networks: [ydsh]
+
+  # --------------------------------------------------- Superset 一次性初始化
+  # 作用：用 REST API 建数据源 → 数据集 → 5+ 图表 → 仪表板（含筛选器与联动）
+  # 幂等：重跑不会重复建（已存在就跳过）
+  # 跑完即退出，不影响 up -d；日志看 docker compose logs superset-init
+  superset-init:
+    image: ydsh/superset:4.1.2
+    container_name: superset-init
+    depends_on:
+      superset:
+        condition: service_healthy
+    environment:
+      SUPERSET_URL: http://superset:8088
+      ADMIN_USERNAME: ${SUPERSET_ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:-admin}
+      HIVE_URI: hive://hive@hive-server:10000/ydsh_ads
+      MYSQL_URI: mysql+pymysql://ydsh_ro:${MYSQL_RO_PASSWORD:-ydsh_ro_2024}@mysql:3306/ydsh_mysql?charset=utf8mb4
+      # 下面两个是给"模型层关联图表"那一步用的：
+      # 脚本会在进程内 create_app()，没有这两项 superset_config.py 会直接抛错。
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:?必须在 .env 里设置 SUPERSET_SECRET_KEY}
+      SUPERSET_METADATA_URI: mysql+pymysql://root:${MYSQL_ROOT_PASSWORD:-root}@mysql:3306/superset_meta?charset=utf8mb4
+      PYTHONPATH: /app/pythonpath
+    command: ["python", "/app/bootstrap.py"]
+    restart: "no"
+    networks: [ydsh]
+
+  # -------------------------------------------------------- 数据服务（JSON 接口）
+  api:
+    build:
+      context: ./第4周
+      dockerfile: docker/app/Dockerfile
+    image: ydsh/app:4.0
+    container_name: ydsh-api
+    depends_on:
+      hive-server:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    environment:
+      HIVE_HOST: hive-server
+      HIVE_PORT: 10000
+      HIVE_DB: ydsh_ads
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: 8123
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-ydsh}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-ydsh123}
+      CLICKHOUSE_DB: ydsh_ads
+      DATA_BACKEND: ${DATA_BACKEND:-auto}
+      CACHE_TTL: ${CACHE_TTL:-10}
+      TZ: Asia/Shanghai
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=10).status==200 else 1)\""]
+      interval: 20s
+      timeout: 15s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks: [ydsh]
+
+  # ------------------------------------------------------ Streamlit 对话式问答
+  app:
+    image: ydsh/app:4.0
+    container_name: ydsh-app
+    depends_on:
+      api:
+        condition: service_started
+      hive-server:
+        condition: service_healthy
+    environment:
+      HIVE_HOST: hive-server
+      HIVE_PORT: 10000
+      HIVE_DB: ydsh_ads
+      # 大模型：只从 .env 注入，容器里不落盘 Key 文件
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://open.bigmodel.cn/api/paas/v4}
+      LLM_MODEL: ${LLM_MODEL:-glm-4-flash-250414}
+      # 浏览器要能访问到这个地址（宿主机映射端口），不是容器名
+      ECHARTS_SRC: ${ECHARTS_SRC:-http://localhost:8000/assets/echarts.min.js}
+      TZ: Asia/Shanghai
+    command:
+      - streamlit
+      - run
+      - streamlit_app.py
+      - --server.port=8501
+      - --server.address=0.0.0.0
+      - --server.headless=true
+      - --browser.gatherUsageStats=false
+    ports:
+      - "8501:8501"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health', timeout=10).status==200 else 1)\""]
+      interval: 20s
+      timeout: 15s
+      retries: 10
+      start_period: 40s
+    restart: unless-stopped
+    networks: [ydsh]
+
+networks:
+  ydsh:
+    driver: bridge
+
+volumes:
+  # ClickHouse 数据卷（见 clickhouse 服务的注释：Windows 下不能用绑定挂载）
+  clickhouse_data:
+    name: ydsh_clickhouse_data

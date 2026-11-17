@@ -1,0 +1,328 @@
+{
+  "meta": {
+    "time": "2026-11-17 09:37:47",
+    "hive": "localhost:10000",
+    "clickhouse": "127.0.0.1:8123",
+    "api": "http://127.0.0.1:8000",
+    "quick": false
+  },
+  "A_baseline": [
+    {
+      "table": "ads_kpi_overview",
+      "rows": 1,
+      "elapsed_s": 1.11
+    },
+    {
+      "table": "ads_kpi_month",
+      "rows": 12,
+      "elapsed_s": 0.93
+    },
+    {
+      "table": "ads_sales_daily",
+      "rows": 366,
+      "elapsed_s": 1.0
+    },
+    {
+      "table": "ads_category_rank",
+      "rows": 96,
+      "elapsed_s": 1.03
+    },
+    {
+      "table": "ads_province_sales",
+      "rows": 180,
+      "elapsed_s": 1.01
+    },
+    {
+      "table": "ads_store_rank",
+      "rows": 720,
+      "elapsed_s": 0.97
+    },
+    {
+      "table": "ads_channel_month",
+      "rows": 48,
+      "elapsed_s": 0.93
+    },
+    {
+      "table": "ads_behavior_funnel",
+      "rows": 3,
+      "elapsed_s": 1.03
+    },
+    {
+      "table": "ads_user_rfm",
+      "rows": 1000,
+      "elapsed_s": 1.04
+    },
+    {
+      "table": "ads_pay_type_month",
+      "rows": 48,
+      "elapsed_s": 0.91
+    },
+    {
+      "table": "ads_hour_category",
+      "rows": 192,
+      "elapsed_s": 1.03
+    }
+  ],
+  "B_concurrency_engine": [
+    {
+      "case": "hive 并发1",
+      "n": 3,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 1399.6,
+      "p50_ms": 1357.1,
+      "p95_ms": 1506.1,
+      "max_ms": 1506.1,
+      "min_ms": 1335.6,
+      "wall_s": 4.2,
+      "qps": 0.71
+    },
+    {
+      "case": "hive 并发2",
+      "n": 6,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 1222.1,
+      "p50_ms": 1199.5,
+      "p95_ms": 1345.7,
+      "max_ms": 1345.7,
+      "min_ms": 1160.8,
+      "wall_s": 3.74,
+      "qps": 1.6
+    },
+    {
+      "case": "hive 并发4",
+      "n": 12,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 1682.4,
+      "p50_ms": 1655.5,
+      "p95_ms": 1885.9,
+      "max_ms": 2003.2,
+      "min_ms": 1515.3,
+      "wall_s": 5.36,
+      "qps": 2.24
+    },
+    {
+      "case": "hive 并发8",
+      "n": 24,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 5791.8,
+      "p50_ms": 4417.7,
+      "p95_ms": 12032.9,
+      "max_ms": 12224.5,
+      "min_ms": 1411.2,
+      "wall_s": 18.03,
+      "qps": 1.33
+    },
+    {
+      "case": "clickhouse 并发1",
+      "n": 3,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 108.3,
+      "p50_ms": 41.2,
+      "p95_ms": 249.2,
+      "max_ms": 249.2,
+      "min_ms": 34.5,
+      "wall_s": 0.33,
+      "qps": 9.22
+    },
+    {
+      "case": "clickhouse 并发2",
+      "n": 6,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 34.0,
+      "p50_ms": 29.6,
+      "p95_ms": 45.1,
+      "max_ms": 45.1,
+      "min_ms": 27.2,
+      "wall_s": 0.1,
+      "qps": 58.14
+    },
+    {
+      "case": "clickhouse 并发4",
+      "n": 12,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 42.9,
+      "p50_ms": 41.1,
+      "p95_ms": 49.0,
+      "max_ms": 54.0,
+      "min_ms": 36.1,
+      "wall_s": 0.13,
+      "qps": 88.99
+    },
+    {
+      "case": "clickhouse 并发8",
+      "n": 24,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 41.1,
+      "p50_ms": 39.4,
+      "p95_ms": 55.3,
+      "max_ms": 66.6,
+      "min_ms": 21.4,
+      "wall_s": 0.15,
+      "qps": 165.16
+    }
+  ],
+  "C_concurrency_api": [
+    {
+      "case": "/api/all（不走缓存） 并发1",
+      "n": 3,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 163.6,
+      "p50_ms": 152.2,
+      "p95_ms": 213.1,
+      "max_ms": 213.1,
+      "min_ms": 125.5,
+      "wall_s": 0.49,
+      "qps": 6.1
+    },
+    {
+      "case": "/api/all（不走缓存） 并发5",
+      "n": 15,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 658.1,
+      "p50_ms": 654.7,
+      "p95_ms": 759.0,
+      "max_ms": 882.0,
+      "min_ms": 516.5,
+      "wall_s": 2.1,
+      "qps": 7.14
+    },
+    {
+      "case": "/api/all（不走缓存） 并发10",
+      "n": 30,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 1270.7,
+      "p50_ms": 1324.4,
+      "p95_ms": 1555.2,
+      "max_ms": 1989.1,
+      "min_ms": 646.5,
+      "wall_s": 4.08,
+      "qps": 7.35
+    },
+    {
+      "case": "/api/all（不走缓存） 并发20",
+      "n": 60,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 2564.0,
+      "p50_ms": 2491.0,
+      "p95_ms": 4482.8,
+      "max_ms": 4774.3,
+      "min_ms": 377.9,
+      "wall_s": 8.87,
+      "qps": 6.76
+    },
+    {
+      "case": "/api/all（默认缓存） 并发1",
+      "n": 3,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 20.7,
+      "p50_ms": 18.0,
+      "p95_ms": 26.3,
+      "max_ms": 26.3,
+      "min_ms": 17.8,
+      "wall_s": 0.06,
+      "qps": 47.51
+    },
+    {
+      "case": "/api/all（默认缓存） 并发5",
+      "n": 15,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 124.1,
+      "p50_ms": 111.6,
+      "p95_ms": 208.6,
+      "max_ms": 230.5,
+      "min_ms": 49.6,
+      "wall_s": 0.43,
+      "qps": 34.51
+    },
+    {
+      "case": "/api/all（默认缓存） 并发10",
+      "n": 30,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 226.4,
+      "p50_ms": 200.2,
+      "p95_ms": 438.2,
+      "max_ms": 571.0,
+      "min_ms": 49.5,
+      "wall_s": 0.84,
+      "qps": 35.87
+    },
+    {
+      "case": "/api/all（默认缓存） 并发20",
+      "n": 60,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "mean_ms": 453.4,
+      "p50_ms": 381.2,
+      "p95_ms": 1092.1,
+      "max_ms": 1162.7,
+      "min_ms": 68.3,
+      "wall_s": 1.65,
+      "qps": 36.37
+    }
+  ],
+  "D_optimization": [
+    {
+      "case": "D1 全表扫描（无分区条件）",
+      "engine": "hive",
+      "elapsed_s": 15.44,
+      "result": "14398"
+    },
+    {
+      "case": "D1 分区裁剪（order_month = 2024-11）",
+      "engine": "hive",
+      "elapsed_s": 2.58,
+      "result": "1183"
+    },
+    {
+      "case": "D1 伪条件（substr(order_date) 无法裁剪分区）",
+      "engine": "hive",
+      "elapsed_s": 15.89,
+      "result": "1183"
+    },
+    {
+      "case": "D2 预聚合（ADS 结果集已算好，单表过滤）",
+      "engine": "hive",
+      "elapsed_s": 1.13,
+      "result": "875880.76"
+    },
+    {
+      "case": "D2 现算（回 DWD 明细，同口径重算）",
+      "engine": "hive",
+      "elapsed_s": 3.25,
+      "result": "875880.76"
+    },
+    {
+      "case": "D2 最差写法（ADS 场景回明细三表 join）",
+      "engine": "hive",
+      "elapsed_s": 5.51,
+      "result": "3083077.48"
+    },
+    {
+      "case": "D3 分桶表 join（dwd_order bucketed by user_id）",
+      "engine": "hive",
+      "elapsed_s": 16.47,
+      "result": "14398"
+    },
+    {
+      "case": "基准：ClickHouse 同一 SQL（与 D2 预聚合完全一致）",
+      "engine": "clickhouse",
+      "elapsed_s": 0.03,
+      "result": "875880.76"
+    }
+  ]
+}

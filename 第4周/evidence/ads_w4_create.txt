@@ -1,0 +1,74 @@
+==============================================================================
+SQL 脚本执行：D:\xiangmushixun-bde\第4周\py\..\sql\ads\create_ads_w4.sql
+连接：Hive localhost:10000  库：ydsh_ads
+语句数：9    开始时间：2026-11-17 08:22:54
+==============================================================================
+
+[1/9] create database if not exists ydsh_ads
+  -> OK  (0.04s)
+
+[2/9] use ydsh_ads
+  -> OK  (0.01s)
+
+[3/9] drop table if exists ads_pay_type_month
+  -> OK  (0.03s)
+
+[4/9] create table ads_pay_type_month ( stat_month     string comment '统计月份 yyyy-MM', pay_code       string comment '支付方式编码（外键 -> dim_pay_type）', pay_name   ...
+  -> OK  (1.22s)
+
+[5/9] drop table if exists ads_hour_category
+  -> OK  (0.05s)
+
+[6/9] create table ads_hour_category ( hour_of_day            int    comment '下单小时（0~23，整数，不是 HH 字符串）', category               string comment '一级类目（8 个：运动户外 ...
+  -> OK  (0.16s)
+
+[7/9] show tables
+  -> 11 行  (0.08s)
+  tab_name           
+  -------------------
+  ads_behavior_funnel
+  ads_category_rank  
+  ads_channel_month  
+  ads_hour_category  
+  ads_kpi_month      
+  ads_kpi_overview   
+  ads_pay_type_month 
+  ads_province_sales 
+  ads_sales_daily    
+  ads_store_rank     
+  ads_user_rfm       
+
+[8/9] describe ads_pay_type_month
+  -> 11 行  (0.12s)
+  col_name     data_type  comment                                       
+  -----------  ---------  ----------------------------------------------
+  stat_month   string     统计月份 yyyy-MM                              
+  pay_code     string     支付方式编码（外键 -> dim_pay_type）          
+  pay_name     string     支付方式名称：微信支付/支付宝/银行卡/货到付款 
+  order_cnt    int        该支付方式订单量                              
+  buyer_cnt    int        该支付方式下单用户数（当月去重）              
+  gmv          double     该支付方式 GMV（订单口径 pay_amount 合计，元）
+  valid_gmv    double     该支付方式有效 GMV（元）                      
+  aov          double     该支付方式客单价 = gmv / order_cnt（元）      
+  gmv_share    double     该支付方式 GMV 占当月比例（0~1）              
+  order_share  double     该支付方式订单量占当月比例（0~1）             
+  rank_no      int        当月 GMV 排名（1 为最高）                     
+
+[9/9] describe ads_hour_category
+  -> 10 行  (0.12s)
+  col_name                data_type  comment                                                      
+  ----------------------  ---------  -------------------------------------------------------------
+  hour_of_day             int        下单小时（0~23，整数，不是 HH 字符串）                       
+  category                string     一级类目（8 个：运动户外/数码家电/…）                       
+  order_cnt               int        该时段该品类订单数（去重订单号）                             
+  item_qty                int        该时段该品类销售件数                                         
+  buyer_cnt               int        该时段该品类下单用户数（全年去重）                           
+  sales_amt               double     销售额（明细分摊 alloc_amount 合计，元）                     
+  avg_item_price          double     件均价 = sales_amt / item_qty（元/件）                       
+  hour_share_of_category  double     该时段销售额占该品类全年比例（0~1），用于看品类自己的时段曲线
+  category_share_of_hour  double     该品类销售额占该时段全品类比例（0~1），用于看时段内的结构    
+  category_order          int        品类全年销售额排名（1 为最高），供图表按业务量排序 Y 轴      
+
+==============================================================================
+汇总：成功 9 条，失败 0 条，总耗时 1.9s
+==============================================================================

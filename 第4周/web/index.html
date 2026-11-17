@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>云购生活 · 经营分析数据大屏</title>
+<!-- 本地引入：现场演示不依赖外网 CDN -->
+<link rel="stylesheet" href="assets/app.css">
+<script src="assets/echarts.min.js"></script>
+</head>
+<body>
+<div id="viewport">
+  <!-- 1920×1080 设计稿画布，整体 scale 缩放适配任意分辨率 -->
+  <div id="stage">
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <div class="brand-text">
+          <h1>云购生活 · 经营分析数据大屏</h1>
+          <p>数仓四层架构 ydsh_ods → dwd → dws → ads ｜ 2024 全年 366 天 · 14,398 笔订单</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="pill" id="backendPill">数据源 · 连接中</span>
+        <span class="clock" id="clock">--:--:--</span>
+      </div>
+    </header>
+
+    <!-- 指标卡：由 JS 填充 -->
+    <section class="kpi-row" id="kpiRow"></section>
+
+    <section class="grid">
+      <div class="panel area-line">
+        <div class="panel-hd"><h3>月度 GMV 与有效营收趋势</h3><span class="hd-tip">柱=GMV ｜ 折线=有效GMV ｜ 虚线=环比</span></div>
+        <div class="chart" id="chartLine"></div>
+      </div>
+
+      <div class="panel area-map">
+        <div class="panel-hd"><h3>省份销售分布</h3><span class="hd-tip">15 个省级区域 ｜ 全年 GMV</span></div>
+        <div class="chart" id="chartMap"></div>
+      </div>
+
+      <div class="panel area-bar">
+        <div class="panel-hd"><h3>品类销售对比</h3><span class="hd-tip">明细分摊口径</span></div>
+        <div class="chart" id="chartBar"></div>
+      </div>
+
+      <div class="panel area-heat">
+        <div class="panel-hd"><h3>时段 × 品类销售热力图</h3><span class="hd-tip">行=品类 ｜ 列=0–23 时 ｜ 颜色=销售额</span></div>
+        <div class="chart" id="chartHeat"></div>
+      </div>
+
+      <div class="panel area-scatter">
+        <div class="panel-hd"><h3>用户价值分布（RFM）</h3><span class="hd-tip">X=最近购买间隔 ｜ Y=累计消费 ｜ 气泡=频次</span></div>
+        <div class="chart" id="chartScatter"></div>
+      </div>
+
+      <div class="panel area-pie">
+        <div class="panel-hd"><h3>支付方式占比</h3><span class="hd-tip">订单口径</span></div>
+        <div class="chart" id="chartPie"></div>
+      </div>
+
+      <div class="panel area-rank">
+        <div class="panel-hd"><h3>门店 TopN</h3><span class="hd-tip">全年 GMV</span></div>
+        <ol class="rank-list" id="rankList"></ol>
+      </div>
+    </section>
+
+    <footer class="statusbar">
+      <span id="statusText">正在加载数据…</span>
+      <span class="dot-sep"></span>
+      <span id="updatedAt">—</span>
+      <span class="grow"></span>
+      <span class="hint">数据每 30 秒自动刷新 ｜ 按 F11 全屏演示</span>
+    </footer>
+  </div>
+</div>
+
+<div id="fatal" class="fatal hidden"><div><h2>数据加载失败</h2><p id="fatalMsg"></p></div></div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

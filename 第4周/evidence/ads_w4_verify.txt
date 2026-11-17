@@ -1,0 +1,213 @@
+==============================================================================
+SQL 脚本执行：D:\xiangmushixun-bde\第4周\sql\ads\verify_ads_w4.sql
+连接：Hive localhost:10000  库：ydsh_ads
+语句数：29    开始时间：2026-11-17 08:24:07
+==============================================================================
+
+[1/29] use ydsh_ads
+  -> OK  (0.01s)
+
+[2/29] select 'ads_pay_type_month 行数' as `检查项`, count(1) as `值` from ads_pay_type_month
+  -> 1 行  (1.10s)
+  检查项                   值
+  -----------------------  --
+  ads_pay_type_month 行数  48
+
+[3/29] select 'ads_pay_type_month 月份数' as `检查项`, count(distinct stat_month) as `值` from ads_pay_type_month
+  -> 1 行  (1.07s)
+  检查项                     值
+  -------------------------  --
+  ads_pay_type_month 月份数  12
+
+[4/29] select 'ads_pay_type_month 支付方式数' as `检查项`, count(distinct pay_code) as `值` from ads_pay_type_month
+  -> 1 行  (1.22s)
+  检查项                         值
+  -----------------------------  --
+  ads_pay_type_month 支付方式数  4 
+
+[5/29] select 'ads_pay_type_month 重复粒度行数' as `检查项`, count(1) as `值` from (select stat_month, pay_code from ads_pay_type_month group by stat_month, pay_code h ...
+  -> 1 行  (1.16s)
+  检查项                           值
+  -------------------------------  --
+  ads_pay_type_month 重复粒度行数  0 
+
+[6/29] select 'ads_hour_category 行数' as `检查项`, count(1) as `值` from ads_hour_category
+  -> 1 行  (0.77s)
+  检查项                  值 
+  ----------------------  ---
+  ads_hour_category 行数  192
+
+[7/29] select 'ads_hour_category 小时数' as `检查项`, count(distinct hour_of_day) as `值` from ads_hour_category
+  -> 1 行  (1.28s)
+  检查项                    值
+  ------------------------  --
+  ads_hour_category 小时数  24
+
+[8/29] select 'ads_hour_category 品类数' as `检查项`, count(distinct category) as `值` from ads_hour_category
+  -> 1 行  (1.17s)
+  检查项                    值
+  ------------------------  --
+  ads_hour_category 品类数  8 
+
+[9/29] select 'ads_hour_category 重复粒度行数' as `检查项`, count(1) as `值` from (select hour_of_day, category from ads_hour_category group by hour_of_day, category h ...
+  -> 1 行  (1.09s)
+  检查项                          值
+  ------------------------------  --
+  ads_hour_category 重复粒度行数  0 
+
+[10/29] select '支付表 GMV 合计' as `检查项`, round(sum(gmv), 2) as `值` from ads_pay_type_month
+  -> 1 行  (0.92s)
+  检查项           值         
+  ---------------  -----------
+  支付表 GMV 合计  36116687.06
+
+[11/29] select 'KPI 总览 GMV' as `检查项`, round(max(gmv), 2) as `值` from ads_kpi_overview
+  -> 1 行  (0.81s)
+  检查项        值         
+  ------------  -----------
+  KPI 总览 GMV  36116687.06
+
+[12/29] select '支付表 有效GMV 合计' as `检查项`, round(sum(valid_gmv), 2) as `值` from ads_pay_type_month
+  -> 1 行  (0.93s)
+  检查项               值         
+  -------------------  -----------
+  支付表 有效GMV 合计  24185272.59
+
+[13/29] select 'KPI 总览 有效GMV' as `检查项`, round(max(valid_gmv), 2) as `值` from ads_kpi_overview
+  -> 1 行  (0.85s)
+  检查项            值         
+  ----------------  -----------
+  KPI 总览 有效GMV  24185272.59
+
+[14/29] select '支付表 订单量合计' as `检查项`, sum(order_cnt) as `值` from ads_pay_type_month
+  -> 1 行  (0.89s)
+  检查项             值   
+  -----------------  -----
+  支付表 订单量合计  14398
+
+[15/29] select 'KPI 总览 订单量' as `检查项`, max(order_cnt) as `值` from ads_kpi_overview
+  -> 1 行  (0.85s)
+  检查项           值   
+  ---------------  -----
+  KPI 总览 订单量  14398
+
+[16/29] select '热力表 销售额合计' as `检查项`, round(sum(sales_amt), 2) as `值` from ads_hour_category
+  -> 1 行  (0.88s)
+  检查项             值         
+  -----------------  -----------
+  热力表 销售额合计  35833305.06
+
+[17/29] select '品类榜 销售额合计' as `检查项`, round(sum(sales_amt), 2) as `值` from ads_category_rank
+  -> 1 行  (0.87s)
+  检查项             值         
+  -----------------  -----------
+  品类榜 销售额合计  35833305.06
+
+[18/29] select '热力表 件数合计' as `检查项`, sum(item_qty) as `值` from ads_hour_category
+  -> 1 行  (0.91s)
+  检查项           值    
+  ---------------  ------
+  热力表 件数合计  105364
+
+[19/29] select '品类榜 件数合计' as `检查项`, sum(item_qty) as `值` from ads_category_rank
+  -> 1 行  (0.88s)
+  检查项           值    
+  ---------------  ------
+  品类榜 件数合计  105364
+
+[20/29] select '支付表 每月 GMV 占比求和偏差' as `检查项`, cast(round(max(abs(s - 1)), 4) as decimal(8, 4)) as `值` from (select stat_month, sum(gmv_share) as s from ads_pay ...
+  -> 1 行  (1.22s)
+  检查项                        值    
+  ----------------------------  ------
+  支付表 每月 GMV 占比求和偏差  0.0000
+
+[21/29] select '热力表 每品类时段占比求和偏差' as `检查项`, cast(round(max(abs(s - 1)), 4) as decimal(8, 4)) as `值` from (select category, sum(hour_share_of_category) as s fro ...
+  -> 1 行  (1.27s)
+  检查项                         值    
+  -----------------------------  ------
+  热力表 每品类时段占比求和偏差  0.0000
+
+[22/29] select '热力表 每小时品类占比求和偏差' as `检查项`, cast(round(max(abs(s - 1)), 4) as decimal(8, 4)) as `值` from (select hour_of_day, sum(category_share_of_hour) as s  ...
+  -> 1 行  (1.40s)
+  检查项                         值    
+  -----------------------------  ------
+  热力表 每小时品类占比求和偏差  0.0000
+
+[23/29] select pay_name, round(sum(gmv), 2)                                              as gmv, sum(order_cnt)                                                ...
+  -> 4 行  (1.46s)
+  pay_name  gmv         order_cnt  gmv_share_of_year
+  --------  ----------  ---------  -----------------
+  微信支付  9668087.14  3827       0.2677           
+  支付宝    9469986.31  3807       0.2622           
+  银行卡    8519081.5   3356       0.2359           
+  货到付款  8459532.11  3408       0.2342           
+
+[24/29] select hour_of_day, round(sum(sales_amt), 2) as sales_amt, sum(order_cnt) as order_cnt from ads_hour_category group by hour_of_day order by hour_of_da ...
+  -> 24 行  (1.27s)
+  hour_of_day  sales_amt   order_cnt
+  -----------  ----------  ---------
+  0            1631379.65  1404     
+  1            1425654.31  1273     
+  2            1574143.47  1366     
+  3            1492752.26  1245     
+  4            1547393.13  1327     
+  5            1540930.64  1288     
+  6            1458694.46  1308     
+  7            1459493.77  1287     
+  8            1427291.23  1233     
+  9            1333221.47  1150     
+  10           1529296.95  1306     
+  11           1558196.73  1282     
+  12           1466279.99  1264     
+  13           1415446.82  1180     
+  14           1554779.98  1337     
+  15           1416538.21  1229     
+  16           1476801.18  1229     
+  17           1456856.32  1236     
+  18           1543131.69  1368     
+  19           1505003.65  1336     
+  20           1536520.93  1293     
+  21           1504554.81  1296     
+  22           1487336.52  1310     
+  23           1491606.89  1323     
+
+[25/29] select category, max(category_order)                                             as category_order, round(sum(sales_amt), 2)                           ...
+  -> 8 行  (1.47s)
+  category  category_order  year_amt    peak_hour
+  --------  --------------  ----------  ---------
+  运动户外  1               5343128.16  20       
+  数码家电  25              4919979.28  18       
+  服饰鞋包  49              4499958.0   3        
+  图书文娱  73              4465991.78  2        
+  食品生鲜  97              4389815.8   20       
+  家居生活  121             4148767.55  11       
+  美妆个护  145             4082211.76  22       
+  母婴玩具  169             3983452.73  14       
+
+[26/29] select '抽样1 支付表 2024-12 微信' as `检查项`, round(sum(gmv), 2) as `值` from ads_pay_type_month where stat_month = '2024-12' and pay_code = 'P2'
+  -> 1 行  (0.82s)
+  检查项                     值       
+  -------------------------  ---------
+  抽样1 支付表 2024-12 微信  875880.76
+
+[27/29] select '抽样1 DWD 复算' as `检查项`, round(sum(pay_amount), 2) as `值` from ydsh_dwd.dwd_order where substr(order_date, 1, 7) = '2024-12' and pay_code = 'P2'
+  -> 1 行  (24.67s)
+  检查项          值       
+  --------------  ---------
+  抽样1 DWD 复算  875880.76
+
+[28/29] select '抽样2 热力表 9点 食品生鲜' as `检查项`, round(sum(sales_amt), 2) as `值` from ads_hour_category where hour_of_day = 9 and category = '食品生鲜'
+  -> 1 行  (1.04s)
+  检查项                     值       
+  -------------------------  ---------
+  抽样2 热力表 9点 食品生鲜  153164.24
+
+[29/29] select '抽样2 DWD 复算' as `检查项`, round(sum(i.alloc_amount), 2) as `值` from ydsh_dwd.dwd_order_item i join ydsh_dwd.dwd_order   o on i.order_id   = o.orde ...
+  -> 1 行  (24.53s)
+  检查项          值       
+  --------------  ---------
+  抽样2 DWD 复算  153164.24
+
+==============================================================================
+汇总：成功 29 条，失败 0 条，总耗时 77.1s
+==============================================================================

@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "time": "2026-11-17 09:36:20",
+    "hive": "localhost:10000",
+    "clickhouse": "127.0.0.1:8123",
+    "api": "http://127.0.0.1:8000",
+    "quick": false
+  },
+  "D_optimization": [
+    {
+      "case": "D1 全表扫描（无分区条件）",
+      "engine": "hive",
+      "elapsed_s": 14.76,
+      "result": "14398"
+    },
+    {
+      "case": "D1 分区裁剪（order_month = 2024-11）",
+      "engine": "hive",
+      "elapsed_s": 2.43,
+      "result": "1183"
+    },
+    {
+      "case": "D1 伪条件（substr(order_date) 无法裁剪分区）",
+      "engine": "hive",
+      "elapsed_s": 15.7,
+      "result": "1183"
+    },
+    {
+      "case": "D2 预聚合（ADS 结果集已算好，单表过滤）",
+      "engine": "hive",
+      "elapsed_s": 1.17,
+      "result": "875880.76"
+    },
+    {
+      "case": "D2 现算（回 DWD 明细，同口径重算）",
+      "engine": "hive",
+      "elapsed_s": 3.01,
+      "result": "875880.76"
+    },
+    {
+      "case": "D2 最差写法（ADS 场景回明细三表 join）",
+      "engine": "hive",
+      "elapsed_s": 5.4,
+      "result": "3083077.48"
+    },
+    {
+      "case": "D3 分桶表 join（dwd_order bucketed by user_id）",
+      "engine": "hive",
+      "elapsed_s": 17.49,
+      "result": "14398"
+    },
+    {
+      "case": "基准：ClickHouse 同一 SQL（与 D2 预聚合完全一致）",
+      "engine": "clickhouse",
+      "elapsed_s": 0.16,
+      "result": "875880.76"
+    }
+  ]
+}
