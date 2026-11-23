@@ -1,0 +1,212 @@
+
+==============================================================================
+  云购生活数仓 · 第 5 周 Git 提交历史审查（原始输出）
+==============================================================================
+生成时间：2026-11-23 08:54:49
+仓库：D:\xiangmushixun-bde
+
+==============================================================================
+  1. git log --oneline --graph --all --decorate
+==============================================================================
+* 98a84a1 (HEAD -> docs/week5-integration) docs(git): 补第5周 PR/Issue 记录、Git 审查报告与第4周直提 main 说明
+* c8b505e docs(readme): 新增英文 README，并统一中文 README 的四层口径
+* 2aecbe9 docs(week5): 新增五篇项目级文档与联调记录（md + Word 双版本）
+* cbcc443 feat(integration): 新增端到端联调自检脚本与逐层核对 SQL
+* 7072b4c chore(docker): 服务数统一为 9 并挂载第 5 周脚本目录
+* 00a0658 (origin/main, origin/HEAD, main) chore(第4周): 刷新重启后三界面自检证据（8 服务从零启动复验通过）
+* 6f43b92 第4周：可视化实现（Superset + ECharts + Streamlit）与 Docker 一键部署
+* 383ec4c feat(run): 增加一键运行启动器与运行说明
+* 678a952 chore: 提交压缩包改为本地生成物，不再入库
+* 57104bc feat(llm): 接入真实大模型，补齐 NL2SQL 与 AI 洞察的实测证据
+* f76e9a7 docs(llm): 补 API 申请配置教程与本地模拟端点联调工具
+* a29f7ff docs(week3): 完成第3周全部交付物文档与 Word/Excel 成品
+*   3b93f20 merge: 解决 README 目录结构合并冲突 (PR #15)
+|\  
+| * 1627270 (origin/docs/readme-index, docs/readme-index) docs(readme): 目录结构补入第3周，指到提交清单便于查阅
+* |   6f59e6a merge: 合入 README 第3周目录（详细版）(PR #14)
+|\ \  
+| |/  
+|/|   
+| * 5385f37 (origin/docs/readme-week3, docs/readme-week3) docs(readme): 目录结构补入第3周，标注 dws/ads/py 子目录
+|/  
+*   8e9aca6 merge: 合入 AI 洞察量价拆解与反思文档 (PR #13)
+|\  
+| * cd471ad (origin/feat/ai-insight, feat/ai-insight) feat(insight): 增加量价拆解归因与 AI 反思文档
+* |   b02aa55 merge: 合入 LLM 多供应商改造 (PR #12)
+|\ \  
+| |/  
+|/|   
+| * 5d23604 (origin/feat/llm-multi-provider, feat/llm-multi-provider) refactor(llm): 配置改为多供应商通用，支持智谱/硅基流动/Ollama
+|/  
+* 47919d1 feat(week3): DWS/ADS 九表建模、KPI 报表、GMV 预测与 NL2SQL 接口
+* e31bfa4 refactor: 按周拆分目录，第 1 周与第 2 周各自独立
+* 416cca8 docs: 补入本人实拍运行截图，第 2 周交付物定稿
+* 3bf3338 chore: 文件名对齐第 2 周提交清单，AI 协同日志补第六节
+* fd0d48e docs: 补充 DWD 表属性与文件数核对说明
+* 0302f0f fix: 修正 Hive 元数据字符集，使中文字段注释真正生效
+* 5f4f581 docs: 第 2 周协同日志与交付清单，更新 README
+* 827e9ed feat: 探索性分析与分析简报
+* 21fdc3b docs: 四层数仓架构设计文档与架构图
+* b30fe3f feat: 数据质量对比统计与修复率报告
+* 8e5fc21 feat: DWD 层 ETL 加载与结构校验
+* d13ef3b feat: DWD 层星型模型建表与分区分桶设计
+* 357d632 feat: 枚举标准化与异常值格式清洗脚本（清洗二）
+* 6712c9f chore: 补充模拟数据目录忽略规则
+* dea0447 docs: 添加第1周提交清单核对表
+* 70ccced docs: 补充 AI 协同日志、Excel 版质量评估表与环境笔记配图
+* 24d1ade docs: 填写团队信息，修正建表脚本路径与目录结构
+* 3a3de02 docs: 补充环境搭建笔记（8 个问题与解决方案）
+* 946d83a feat: 缺失值填充与重复订单去重（清洗一）
+* 68f348b feat: 数据质量五维度预评估与评估表
+* e85f114 feat: ODS 层 6 张表建表与数据导入脚本
+* 24c4cdf chore: 初始化项目结构与 Docker 环境编排
+
+==============================================================================
+  2. git branch -a
+==============================================================================
+  docs/readme-index
+  docs/readme-week3
+* docs/week5-integration
+  feat/ai-insight
+  feat/llm-multi-provider
+  main
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/docs/readme-index
+  remotes/origin/docs/readme-week3
+  remotes/origin/feat/ai-insight
+  remotes/origin/feat/llm-multi-provider
+  remotes/origin/main
+
+==============================================================================
+  3. 提交类型统计（约定式提交前缀）
+==============================================================================
+  docs          15  (35.7%)
+  feat          13  (31.0%)
+  chore          6  (14.3%)
+  merge          4  (9.5%)
+  refactor       2  (4.8%)
+  （无前缀）          1  (2.4%)
+  fix            1  (2.4%)
+  合计            42
+  不符合约定式提交的条目：
+    - 第4周：可视化实现（Superset + ECharts + Streamlit）与 Docker 一键部署
+
+==============================================================================
+  4. 提交总数与分支数
+==============================================================================
+  提交总数：42
+  本地分支：6
+  远端分支：6
+  分支清单：
+    docs/readme-index
+    docs/readme-week3
+    docs/week5-integration
+    feat/ai-insight
+    feat/llm-multi-provider
+    main
+
+==============================================================================
+  5. 全部提交（哈希 | 日期 | 作者 | 主题）
+==============================================================================
+98a84a1 | 2026-11-23 | 余天乐 | docs(git): 补第5周 PR/Issue 记录、Git 审查报告与第4周直提 main 说明
+c8b505e | 2026-11-23 | 余天乐 | docs(readme): 新增英文 README，并统一中文 README 的四层口径
+2aecbe9 | 2026-11-23 | 余天乐 | docs(week5): 新增五篇项目级文档与联调记录（md + Word 双版本）
+cbcc443 | 2026-11-23 | 余天乐 | feat(integration): 新增端到端联调自检脚本与逐层核对 SQL
+7072b4c | 2026-11-23 | 余天乐 | chore(docker): 服务数统一为 9 并挂载第 5 周脚本目录
+00a0658 | 2026-11-17 | 余天乐 | chore(第4周): 刷新重启后三界面自检证据（8 服务从零启动复验通过）
+6f43b92 | 2026-11-17 | 余天乐 | 第4周：可视化实现（Superset + ECharts + Streamlit）与 Docker 一键部署
+383ec4c | 2026-11-10 | 余天乐 | feat(run): 增加一键运行启动器与运行说明
+678a952 | 2026-11-10 | 余天乐 | chore: 提交压缩包改为本地生成物，不再入库
+57104bc | 2026-11-10 | 余天乐 | feat(llm): 接入真实大模型，补齐 NL2SQL 与 AI 洞察的实测证据
+f76e9a7 | 2026-11-10 | 余天乐 | docs(llm): 补 API 申请配置教程与本地模拟端点联调工具
+a29f7ff | 2026-11-10 | 余天乐 | docs(week3): 完成第3周全部交付物文档与 Word/Excel 成品
+3b93f20 | 2026-11-10 | 余天乐 | merge: 解决 README 目录结构合并冲突 (PR #15)
+6f59e6a | 2026-11-10 | 余天乐 | merge: 合入 README 第3周目录（详细版）(PR #14)
+1627270 | 2026-11-10 | 余天乐 | docs(readme): 目录结构补入第3周，指到提交清单便于查阅
+5385f37 | 2026-11-10 | 余天乐 | docs(readme): 目录结构补入第3周，标注 dws/ads/py 子目录
+8e9aca6 | 2026-11-10 | 余天乐 | merge: 合入 AI 洞察量价拆解与反思文档 (PR #13)
+b02aa55 | 2026-11-10 | 余天乐 | merge: 合入 LLM 多供应商改造 (PR #12)
+cd471ad | 2026-11-10 | 余天乐 | feat(insight): 增加量价拆解归因与 AI 反思文档
+5d23604 | 2026-11-10 | 余天乐 | refactor(llm): 配置改为多供应商通用，支持智谱/硅基流动/Ollama
+47919d1 | 2026-11-09 | 余天乐 | feat(week3): DWS/ADS 九表建模、KPI 报表、GMV 预测与 NL2SQL 接口
+e31bfa4 | 2026-11-03 | 余天乐 | refactor: 按周拆分目录，第 1 周与第 2 周各自独立
+416cca8 | 2026-11-03 | 余天乐 | docs: 补入本人实拍运行截图，第 2 周交付物定稿
+3bf3338 | 2026-11-03 | 余天乐 | chore: 文件名对齐第 2 周提交清单，AI 协同日志补第六节
+fd0d48e | 2026-11-02 | 余天乐 | docs: 补充 DWD 表属性与文件数核对说明
+0302f0f | 2026-11-02 | 余天乐 | fix: 修正 Hive 元数据字符集，使中文字段注释真正生效
+5f4f581 | 2026-11-02 | 余天乐 | docs: 第 2 周协同日志与交付清单，更新 README
+827e9ed | 2026-11-02 | 余天乐 | feat: 探索性分析与分析简报
+21fdc3b | 2026-11-02 | 余天乐 | docs: 四层数仓架构设计文档与架构图
+b30fe3f | 2026-11-02 | 余天乐 | feat: 数据质量对比统计与修复率报告
+8e5fc21 | 2026-11-02 | 余天乐 | feat: DWD 层 ETL 加载与结构校验
+d13ef3b | 2026-11-02 | 余天乐 | feat: DWD 层星型模型建表与分区分桶设计
+357d632 | 2026-11-02 | 余天乐 | feat: 枚举标准化与异常值格式清洗脚本（清洗二）
+6712c9f | 2026-10-27 | 余天乐 | chore: 补充模拟数据目录忽略规则
+dea0447 | 2026-10-27 | 余天乐 | docs: 添加第1周提交清单核对表
+70ccced | 2026-10-27 | 余天乐 | docs: 补充 AI 协同日志、Excel 版质量评估表与环境笔记配图
+24d1ade | 2026-10-27 | 余天乐 | docs: 填写团队信息，修正建表脚本路径与目录结构
+3a3de02 | 2026-10-27 | 余天乐 | docs: 补充环境搭建笔记（8 个问题与解决方案）
+946d83a | 2026-10-27 | 余天乐 | feat: 缺失值填充与重复订单去重（清洗一）
+68f348b | 2026-10-27 | 余天乐 | feat: 数据质量五维度预评估与评估表
+e85f114 | 2026-10-27 | 余天乐 | feat: ODS 层 6 张表建表与数据导入脚本
+24c4cdf | 2026-10-27 | 余天乐 | chore: 初始化项目结构与 Docker 环境编排
+
+==============================================================================
+  6. 密钥泄露自查（git grep 'sk-'）
+==============================================================================
+README.en.md:301:- **Secrets discipline**: three-tier config (template → local `.env` → container env). No key ever appears in code, image or log; `git grep "sk-"` returns nothing.
+第3周/docs/NL2SQL接口说明.md:241:| 提供模板 | `.env.example` 只放占位符 `sk-your-key-here` |
+第3周/docs/NL2SQL接口说明.md:244:| 泄露可自查 | `git status` 看不到 `.env`；`git log -p` 搜不到 `sk-` |
+第3周/py/.env.example:31:# LLM_API_KEY=sk-你的DeepSeekKey
+第3周/py/.env.example:40:# LLM_API_KEY=sk-你的硅基流动Key
+第3周/py/llm_client.py:78:    return bool(key) and not key.startswith(("sk-your", "your-", "<"))
+第4周/docs/提交清单核对_第4周.md:142:- [x] 代码中无明文 Key（`git grep -n "sk-"` 只有文档示例）
+第4周/docs/第4周_API配置指南.md:110:LLM_API_KEY=sk-你的deepseek密钥
+第4周/docs/第4周_API配置指南.md:211:| 2 | 仓库内无明文 Key | `git grep -n "sk-" -- .` | 无结果（除文档示例） |
+第4周/py/llm_client.py:89:    return bool(key) and not key.startswith(("sk-your", "your-", "<"))
+第4周/web/assets/app.css:57:  mask-image: radial-gradient(circle at 50% 42%, #000 42%, transparent 88%);
+第5周/docs/API配置指南.md:129:LLM_API_KEY=sk-你的deepseek密钥
+第5周/docs/API配置指南.md:350:| 2 | 仓库内无明文 Key | `git grep -n "sk-" -- .` | 无结果（除文档示例） |
+第5周/docs/Git提交历史审查报告.md:115:| 仓库内是否有明文 Key | `git grep -n "sk-" -- .` | ✅ 5 处命中全部是占位符或文档示例（`sk-your-key-here`、`sk-你的DeepSeekKey`），无真实 Key |
+第5周/docs/部署手册.md:433:| 16 | 密钥不入库 | `git status` / `git grep "sk-"` | 看不到 `.env`，无明文 Key |
+第5周/docs/需求文档.md:120:| NFR-04 | 安全 | 密钥不进仓库、不进镜像、不进日志 | `.env` 被 `.gitignore` 排除；`git grep "sk-"` 无明文 |
+第5周/evidence/git_review.txt:121:"\347\254\2543\345\221\250/docs/NL2SQL\346\216\245\345\217\243\350\257\264\346\230\216.md":241:| 提供模板 | `.env.example` 只放占位符 `sk-your-key-here` |
+第5周/evidence/git_review.txt:122:"\347\254\2543\345\221\250/docs/NL2SQL\346\216\245\345\217\243\350\257\264\346\230\216.md":244:| 泄露可自查 | `git status` 看不到 `.env`；`git log -p` 搜不到 `sk-` |
+第5周/evidence/git_review.txt:123:"\347\254\2543\345\221\250/py/.env.example":31:# LLM_API_KEY=sk-你的DeepSeekKey
+第5周/evidence/git_review.txt:124:"\347\254\2543\345\221\250/py/.env.example":40:# LLM_API_KEY=sk-你的硅基流动Key
+第5周/evidence/git_review.txt:125:"\347\254\2543\345\221\250/py/llm_client.py":78:    return bool(key) and not key.startswith(("sk-your", "your-", "<"))
+第5周/evidence/git_review.txt:128:(以上为空即表示仓库内无 sk- 开头的明文 Key)
+
+  说明：以上命中均为占位符或文档示例（如 sk-your-key-here、sk-你的DeepSeekKey），
+        以及 llm_client.py 里用于识别占位符的 startswith 判断，无真实 Key。
+
+==============================================================================
+  7. .env 是否被 Git 忽略
+==============================================================================
+  .gitignore:10:.env	.env
+  .env 是否被跟踪：否（正确）
+
+==============================================================================
+  8. 被跟踪的大文件 Top8（git ls-tree -r -l HEAD）
+==============================================================================
+   2,481,560 B  lib/mysql-connector-j-8.0.33.jar
+   1,030,855 B  第4周/web/assets/echarts.min.js
+   1,026,632 B  第5周/docs/部署手册.docx
+     684,420 B  第4周/docs/images/screen_01_dashboard.png
+     582,522 B  第4周/web/assets/china.json
+     476,431 B  第2周/docs/数仓架构设计文档.docx
+     266,753 B  第5周/docs/架构设计文档.docx
+     246,892 B  第3周/docs/images/fig_01_gmv_trend.png
+
+  被跟踪文件合计：240 个，总体积 10.9 MB
+  说明：lib/mysql-connector-j-8.0.33.jar 是 Hive 连接 MySQL 的 JDBC 驱动（必要依赖）；
+        echarts.min.js 与 china.json 是本地化资源（断网可演示）；
+        仓库内无 zip / 数据文件 / 密钥文件被跟踪。
+
+==============================================================================
+  9. 结论
+==============================================================================
+  - 主干历史清晰，第 1～3 周有真实分支合并结构，第 4 周为直链（已在
+    docs/git/week4_direct_to_main_explained.txt 中记录成因与整改）
+  - 约定式提交规范率见第 3 节
+  - 无敏感信息入库，无超大文件

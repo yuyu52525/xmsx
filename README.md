@@ -36,14 +36,14 @@
 | 数据服务 | FastAPI + uvicorn | 10 个 JSON 接口 + 大屏静态托管 |
 | 大模型 | 智谱 GLM-4-Flash（可切 DeepSeek / 硅基流动 / Ollama） | 自然语言 → SQL |
 | OLAP 加速 | ClickHouse 24.8 | ADS 结果集服务层缓存（压测对比 + 大屏高频读取） |
-| 容器化 | Docker Compose（8 服务） | 一键部署、健康检查、依赖编排 |
+| 容器化 | Docker Compose（9 服务 = 7 常驻 + 2 一次性） | 一键部署、健康检查、依赖编排 |
 | 版本控制 | Git | 团队协作 |
 
 ## 四、目录结构
 
 ```
 .
-├── docker-compose.yml        # 8 个服务的一键编排（含 healthcheck / 依赖顺序）
+├── docker-compose.yml        # 9 个服务的一键编排（含 healthcheck / 依赖顺序）
 ├── .env.example              # 环境变量模板（复制成 .env 后填密钥）
 ├── data/                     # 数据目录（已 gitignore）
 │   ├── csv/                  # 6 个 ODS 源 CSV
@@ -64,7 +64,14 @@
 │   ├── docs/                  # 5 篇文档 + 提交清单 + 4 张截图
 │   ├── evidence/              # 真实运行输出
 │   └── 一键运行/              # 9 个 bat，双击即可
-└── README.md
+├── 第5周/                     # 项目整合：端到端联调脚本、五大项目文档、证据
+│   ├── py/                    # e2e_verify.py（39 项核对）、fetch_kpi.py、md2docx.py
+│   ├── sql/                   # 逐层核对 SQL
+│   ├── docs/                  # 需求/清洗/架构/部署/API 五篇 + 日志 + PR 记录
+│   ├── evidence/              # 联调与取数证据
+│   └── 一键运行/              # 端到端自检 bat
+├── README.md                  # 中文 README
+└── README.en.md               # 英文 README（国际化门面）
 ```
 
 ## 五、环境启动（一键部署）
@@ -79,9 +86,9 @@ cp .env.example .env          # Windows: Copy-Item .env.example .env
 # 2. 构建镜像（Superset 补 Hive 驱动；应用镜像装 FastAPI/Streamlit/LangChain）
 docker compose build
 
-# 3. 一键启动 8 个服务
+# 3. 一键启动 9 个服务
 docker compose up -d
-docker compose ps            # 期望：6 个 healthy + 2 个 Exited(0)（* -init 是一次性任务）
+docker compose ps            # 期望：7 个 healthy + 2 个 Exited(0)（* -init 是一次性任务）
 
 # 4. 初始化可视化数据（建 2 张新表 → 校验 → 导 ClickHouse → 导 MySQL）
 cd 第4周/py
@@ -151,7 +158,8 @@ docker compose run --rm --entrypoint python superset-init /app/check_superset.py
 | ARPU | 36,116.69 元 |
 | 品类销售合计（明细分摊口径） | 35,833,305.06 元 |
 | 支付方式第一 | 微信支付 9,668,087.14 元（26.77%） |
-| 省份 / 门店第一 | 陕西省 2,851,136.58 元 / 北京二店（合并口径）1,321,107.24 元 |
+| 省份第一 | 陕西省 2,851,136.58 元（7.89%） |
+| 门店第一（按 store_id） | S029 云购生活·北京二店 708,051.42 元（⚠ 按名称聚合会把 S029 与 S039 合并成 1,321,107.24 元，本项目统一按编号） |
 
 ### 6.4 质量治理成果
 
@@ -182,6 +190,17 @@ docker compose run --rm --entrypoint python superset-init /app/check_superset.py
 | 第 2 周 | 清洗（二）、四层架构设计、DWD 维度建模、探索性分析 | 已完成 |
 | 第 3 周 | DWS 汇总层、ADS 指标层、KPI 计算、预测建模、NL2SQL、AI 洞察 | 已完成 |
 | 第 4 周 | Superset 仪表板、ECharts 大屏、Streamlit 问答、Docker 一键部署、压测与优化 | 已完成 |
+| 第 5 周 | 端到端联调、五大项目文档、英文 README、Git 历史治理、综合答辩 | 已完成（答辩 PPT 待做） |
+
+### 6.6 第 5 周关键成果
+
+| 项 | 结果 |
+|---|---|
+| 端到端联调 | 第5周/py/e2e_verify.py 39 项核对全部 PASS（服务/四层行数/指标口径/两份副本/10 接口） |
+| 五大文档 | 需求文档、数据质量清洗报告、架构设计文档、部署手册、API 配置指南（md + docx） |
+| 英文 README | README.en.md（11 节，含架构图、快速开始、指标体系、已知局限） |
+| Git 治理 | 第 5 周走 docs/week5-integration 分支 + PR 记录，补第 4 周漏走分支的说明 |
+| 口径统一 | 服务数统一为 9；剔除率统一为 3.29%；门店排名统一按 store_id |
 
 ## 八、文档索引
 
