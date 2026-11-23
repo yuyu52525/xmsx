@@ -143,7 +143,7 @@ docker compose run --rm --entrypoint python superset-init /app/check_superset.py
 | 阶段 | 行数 |
 |---|---|
 | ODS 原始导入 | 114,809 |
-| DWD 清洗后 | 111,037（−3.28%，删除项均有业务依据） |
+| DWD 清洗后 | 111,037（−3.29%，删除项均有业务依据） |
 | ADS 可视化结果集 | 2,666（11 张表，供三端图表直接取用） |
 
 ### 6.3 核心指标（2024 全年，订单口径）
