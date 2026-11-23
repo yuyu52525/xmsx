@@ -68,9 +68,9 @@ select count(*) as `dws_behavior_day行数` from ydsh_dws.dws_behavior_day;
 -- ---------------------------------------------------------------------------
 -- 5. DWS 汇总值回算：日 / 周 / 月 三个粒度的 GMV 加总都必须等于 36,116,687.06
 -- ---------------------------------------------------------------------------
-select 'day' as `粒度`, round(sum(gmv), 2) as `GMV合计` from ydsh_dws.dws_sales_day
-union all select 'week',  round(sum(gmv), 2) from ydsh_dws.dws_sales_week
-union all select 'month', round(sum(gmv), 2) from ydsh_dws.dws_sales_month;
+select 'day' as `粒度`, cast(round(sum(gmv), 2) as decimal(18, 2)) as `GMV合计` from ydsh_dws.dws_sales_day
+union all select 'week',  cast(round(sum(gmv), 2) as decimal(18, 2)) from ydsh_dws.dws_sales_week
+union all select 'month', cast(round(sum(gmv), 2) as decimal(18, 2)) from ydsh_dws.dws_sales_month;
 
 -- ---------------------------------------------------------------------------
 -- 6. ADS 应用层：11 张表
@@ -93,12 +93,12 @@ union all select 'ads_hour_category',  count(*) from ydsh_ads.ads_hour_category;
 -- ---------------------------------------------------------------------------
 -- 7. 核心指标：订单口径 GMV / 有效 GMV / 订单量 / 买家数 / 客单价 / ARPU
 -- ---------------------------------------------------------------------------
-select gmv               as `GMV`
-     , valid_gmv         as `有效GMV`
+select cast(gmv as decimal(18,2))       as `GMV`
+     , cast(valid_gmv as decimal(18,2)) as `有效GMV`
      , order_cnt         as `订单量`
      , buyer_cnt         as `下单用户`
-     , aov               as `客单价`
-     , arpu              as `ARPU`
+     , cast(aov as decimal(18,2))       as `客单价`
+     , cast(arpu as decimal(18,2))      as `ARPU`
      , round(valid_revenue_rate * 100, 2) as `有效营收占比`
   from ydsh_ads.ads_kpi_overview;
 
@@ -107,17 +107,17 @@ select gmv               as `GMV`
 -- ---------------------------------------------------------------------------
 -- 8. 三种金额口径：必须分别等于 36,116,687.06 / 35,833,305.06 / 402,816,786.63
 -- ---------------------------------------------------------------------------
-select '订单口径 pay_amount'   as `口径`, round(sum(pay_amount), 2)  as `合计`
+select '订单口径 pay_amount'   as `口径`, cast(round(sum(pay_amount), 2) as decimal(18, 2))  as `合计`
   from ydsh_dwd.dwd_order
 union all
-select '分摊口径 alloc_amount', round(sum(alloc_amount), 2) from ydsh_dwd.dwd_order_item
+select '分摊口径 alloc_amount', cast(round(sum(alloc_amount), 2) as decimal(18, 2)) from ydsh_dwd.dwd_order_item
 union all
-select '原价口径 item_amount',  round(sum(item_amount), 2)  from ydsh_dwd.dwd_order_item;
+select '原价口径 item_amount',  cast(round(sum(item_amount), 2) as decimal(18, 2))  from ydsh_dwd.dwd_order_item;
 
 -- 三者不可相加：订单口径 − 分摊口径 = 283,382.65 元 = 114 张无明细订单的实付
 
 -- 无明细订单张数与金额（解释上面那 283,382.65 元的来源）
-select count(*) as `无明细订单数`, round(sum(o.pay_amount), 2) as `实付合计`
+select count(*) as `无明细订单数`, cast(round(sum(o.pay_amount), 2) as decimal(18, 2)) as `实付合计`
   from ydsh_dwd.dwd_order o
   left join (select distinct order_id from ydsh_dwd.dwd_order_item) i
          on o.order_id = i.order_id
@@ -126,15 +126,15 @@ select count(*) as `无明细订单数`, round(sum(o.pay_amount), 2) as `实付�
 -- ---------------------------------------------------------------------------
 -- 9. ADS 各维度加总交叉校验（同一指标在不同表里必须对得上）
 -- ---------------------------------------------------------------------------
-select 'ads_kpi_month.gmv'      as `表.字段`, round(sum(gmv), 2) as `合计` from ydsh_ads.ads_kpi_month
-union all select 'ads_sales_daily.gmv',      round(sum(gmv), 2) from ydsh_ads.ads_sales_daily
-union all select 'ads_province_sales.gmv',   round(sum(gmv), 2) from ydsh_ads.ads_province_sales
-union all select 'ads_store_rank.gmv',       round(sum(gmv), 2) from ydsh_ads.ads_store_rank
-union all select 'ads_channel_month.gmv',    round(sum(gmv), 2) from ydsh_ads.ads_channel_month;
+select 'ads_kpi_month.gmv'      as `表.字段`, cast(round(sum(gmv), 2) as decimal(18, 2)) as `合计` from ydsh_ads.ads_kpi_month
+union all select 'ads_sales_daily.gmv',      cast(round(sum(gmv), 2) as decimal(18, 2)) from ydsh_ads.ads_sales_daily
+union all select 'ads_province_sales.gmv',   cast(round(sum(gmv), 2) as decimal(18, 2)) from ydsh_ads.ads_province_sales
+union all select 'ads_store_rank.gmv',       cast(round(sum(gmv), 2) as decimal(18, 2)) from ydsh_ads.ads_store_rank
+union all select 'ads_channel_month.gmv',    cast(round(sum(gmv), 2) as decimal(18, 2)) from ydsh_ads.ads_channel_month;
 
-select 'ads_pay_type_month.gmv'  as `表.字段`, round(sum(gmv), 2) as `合计` from ydsh_ads.ads_pay_type_month
-union all select 'ads_category_rank.sales_amt', round(sum(sales_amt), 2) from ydsh_ads.ads_category_rank
-union all select 'ads_hour_category.sales_amt', round(sum(sales_amt), 2) from ydsh_ads.ads_hour_category;
+select 'ads_pay_type_month.gmv'  as `表.字段`, cast(round(sum(gmv), 2) as decimal(18, 2)) as `合计` from ydsh_ads.ads_pay_type_month
+union all select 'ads_category_rank.sales_amt', cast(round(sum(sales_amt), 2) as decimal(18, 2)) from ydsh_ads.ads_category_rank
+union all select 'ads_hour_category.sales_amt', cast(round(sum(sales_amt), 2) as decimal(18, 2)) from ydsh_ads.ads_hour_category;
 
 -- 期望：前 6 行全部 36,116,687.06；后 2 行全部 35,833,305.06
 
@@ -142,7 +142,7 @@ union all select 'ads_hour_category.sales_amt', round(sum(sales_amt), 2) from yd
 -- 10. 门店排名：必须按 store_id 聚合（60 个编号只有 52 个名称）
 -- ---------------------------------------------------------------------------
 select store_id as `门店编号`, store_name as `门店名称`, province as `省份`
-     , round(sum(gmv), 2) as `GMV`
+     , cast(round(sum(gmv), 2) as decimal(18, 2)) as `GMV`
      , sum(order_cnt)     as `订单量`
   from ydsh_ads.ads_store_rank
  group by store_id, store_name, province
