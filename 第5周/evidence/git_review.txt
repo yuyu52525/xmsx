@@ -1,0 +1,145 @@
+===== git log --oneline --graph --all --decorate =====
+* 00a0658 (HEAD -> main, origin/main, origin/HEAD) chore(第4周): 刷新重启后三界面自检证据（8 服务从零启动复验通过）
+* 6f43b92 第4周：可视化实现（Superset + ECharts + Streamlit）与 Docker 一键部署
+* 383ec4c feat(run): 增加一键运行启动器与运行说明
+* 678a952 chore: 提交压缩包改为本地生成物，不再入库
+* 57104bc feat(llm): 接入真实大模型，补齐 NL2SQL 与 AI 洞察的实测证据
+* f76e9a7 docs(llm): 补 API 申请配置教程与本地模拟端点联调工具
+* a29f7ff docs(week3): 完成第3周全部交付物文档与 Word/Excel 成品
+*   3b93f20 merge: 解决 README 目录结构合并冲突 (PR #15)
+|\  
+| * 1627270 (origin/docs/readme-index, docs/readme-index) docs(readme): 目录结构补入第3周，指到提交清单便于查阅
+* |   6f59e6a merge: 合入 README 第3周目录（详细版）(PR #14)
+|\ \  
+| |/  
+|/|   
+| * 5385f37 (origin/docs/readme-week3, docs/readme-week3) docs(readme): 目录结构补入第3周，标注 dws/ads/py 子目录
+|/  
+*   8e9aca6 merge: 合入 AI 洞察量价拆解与反思文档 (PR #13)
+|\  
+| * cd471ad (origin/feat/ai-insight, feat/ai-insight) feat(insight): 增加量价拆解归因与 AI 反思文档
+* |   b02aa55 merge: 合入 LLM 多供应商改造 (PR #12)
+|\ \  
+| |/  
+|/|   
+| * 5d23604 (origin/feat/llm-multi-provider, feat/llm-multi-provider) refactor(llm): 配置改为多供应商通用，支持智谱/硅基流动/Ollama
+|/  
+* 47919d1 feat(week3): DWS/ADS 九表建模、KPI 报表、GMV 预测与 NL2SQL 接口
+* e31bfa4 refactor: 按周拆分目录，第 1 周与第 2 周各自独立
+* 416cca8 docs: 补入本人实拍运行截图，第 2 周交付物定稿
+* 3bf3338 chore: 文件名对齐第 2 周提交清单，AI 协同日志补第六节
+* fd0d48e docs: 补充 DWD 表属性与文件数核对说明
+* 0302f0f fix: 修正 Hive 元数据字符集，使中文字段注释真正生效
+* 5f4f581 docs: 第 2 周协同日志与交付清单，更新 README
+* 827e9ed feat: 探索性分析与分析简报
+* 21fdc3b docs: 四层数仓架构设计文档与架构图
+* b30fe3f feat: 数据质量对比统计与修复率报告
+* 8e5fc21 feat: DWD 层 ETL 加载与结构校验
+* d13ef3b feat: DWD 层星型模型建表与分区分桶设计
+* 357d632 feat: 枚举标准化与异常值格式清洗脚本（清洗二）
+* 6712c9f chore: 补充模拟数据目录忽略规则
+* dea0447 docs: 添加第1周提交清单核对表
+* 70ccced docs: 补充 AI 协同日志、Excel 版质量评估表与环境笔记配图
+* 24d1ade docs: 填写团队信息，修正建表脚本路径与目录结构
+* 3a3de02 docs: 补充环境搭建笔记（8 个问题与解决方案）
+* 946d83a feat: 缺失值填充与重复订单去重（清洗一）
+* 68f348b feat: 数据质量五维度预评估与评估表
+* e85f114 feat: ODS 层 6 张表建表与数据导入脚本
+* 24c4cdf chore: 初始化项目结构与 Docker 环境编排
+
+
+===== git branch -a =====
+  docs/readme-index
+  docs/readme-week3
+  feat/ai-insight
+  feat/llm-multi-provider
+* main
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/docs/readme-index
+  remotes/origin/docs/readme-week3
+  remotes/origin/feat/ai-insight
+  remotes/origin/feat/llm-multi-provider
+  remotes/origin/main
+
+
+===== 提交类型统计（约定式提交前缀） =====
+
+Count Name     
+----- ----     
+   12 feat     
+   12 docs     
+    5 chore    
+    4 merge    
+    2 refactor 
+    1 fix      
+    1 第4周：可视化实现
+
+
+
+
+===== 全部提交（编号/哈希/日期/主题） =====
+00a0658 | 2026-11-17 | chore(第4周): 刷新重启后三界面自检证据（8 服务从零启动复验通过）
+6f43b92 | 2026-11-17 | 第4周：可视化实现（Superset + ECharts + Streamlit）与 Docker 一键部署
+383ec4c | 2026-11-10 | feat(run): 增加一键运行启动器与运行说明
+678a952 | 2026-11-10 | chore: 提交压缩包改为本地生成物，不再入库
+57104bc | 2026-11-10 | feat(llm): 接入真实大模型，补齐 NL2SQL 与 AI 洞察的实测证据
+f76e9a7 | 2026-11-10 | docs(llm): 补 API 申请配置教程与本地模拟端点联调工具
+a29f7ff | 2026-11-10 | docs(week3): 完成第3周全部交付物文档与 Word/Excel 成品
+3b93f20 | 2026-11-10 | merge: 解决 README 目录结构合并冲突 (PR #15)
+6f59e6a | 2026-11-10 | merge: 合入 README 第3周目录（详细版）(PR #14)
+1627270 | 2026-11-10 | docs(readme): 目录结构补入第3周，指到提交清单便于查阅
+5385f37 | 2026-11-10 | docs(readme): 目录结构补入第3周，标注 dws/ads/py 子目录
+8e9aca6 | 2026-11-10 | merge: 合入 AI 洞察量价拆解与反思文档 (PR #13)
+b02aa55 | 2026-11-10 | merge: 合入 LLM 多供应商改造 (PR #12)
+cd471ad | 2026-11-10 | feat(insight): 增加量价拆解归因与 AI 反思文档
+5d23604 | 2026-11-10 | refactor(llm): 配置改为多供应商通用，支持智谱/硅基流动/Ollama
+47919d1 | 2026-11-09 | feat(week3): DWS/ADS 九表建模、KPI 报表、GMV 预测与 NL2SQL 接口
+e31bfa4 | 2026-11-03 | refactor: 按周拆分目录，第 1 周与第 2 周各自独立
+416cca8 | 2026-11-03 | docs: 补入本人实拍运行截图，第 2 周交付物定稿
+3bf3338 | 2026-11-03 | chore: 文件名对齐第 2 周提交清单，AI 协同日志补第六节
+fd0d48e | 2026-11-02 | docs: 补充 DWD 表属性与文件数核对说明
+0302f0f | 2026-11-02 | fix: 修正 Hive 元数据字符集，使中文字段注释真正生效
+5f4f581 | 2026-11-02 | docs: 第 2 周协同日志与交付清单，更新 README
+827e9ed | 2026-11-02 | feat: 探索性分析与分析简报
+21fdc3b | 2026-11-02 | docs: 四层数仓架构设计文档与架构图
+b30fe3f | 2026-11-02 | feat: 数据质量对比统计与修复率报告
+8e5fc21 | 2026-11-02 | feat: DWD 层 ETL 加载与结构校验
+d13ef3b | 2026-11-02 | feat: DWD 层星型模型建表与分区分桶设计
+357d632 | 2026-11-02 | feat: 枚举标准化与异常值格式清洗脚本（清洗二）
+6712c9f | 2026-10-27 | chore: 补充模拟数据目录忽略规则
+dea0447 | 2026-10-27 | docs: 添加第1周提交清单核对表
+70ccced | 2026-10-27 | docs: 补充 AI 协同日志、Excel 版质量评估表与环境笔记配图
+24d1ade | 2026-10-27 | docs: 填写团队信息，修正建表脚本路径与目录结构
+3a3de02 | 2026-10-27 | docs: 补充环境搭建笔记（8 个问题与解决方案）
+946d83a | 2026-10-27 | feat: 缺失值填充与重复订单去重（清洗一）
+68f348b | 2026-10-27 | feat: 数据质量五维度预评估与评估表
+e85f114 | 2026-10-27 | feat: ODS 层 6 张表建表与数据导入脚本
+24c4cdf | 2026-10-27 | chore: 初始化项目结构与 Docker 环境编排
+
+
+===== 密钥泄露自查 =====
+"\347\254\2543\345\221\250/docs/NL2SQL\346\216\245\345\217\243\350\257\264\346\230\216.md":241:| 提供模板 | `.env.example` 只放占位符 `sk-your-key-here` |
+"\347\254\2543\345\221\250/docs/NL2SQL\346\216\245\345\217\243\350\257\264\346\230\216.md":244:| 泄露可自查 | `git status` 看不到 `.env`；`git log -p` 搜不到 `sk-` |
+"\347\254\2543\345\221\250/py/.env.example":31:# LLM_API_KEY=sk-你的DeepSeekKey
+"\347\254\2543\345\221\250/py/.env.example":40:# LLM_API_KEY=sk-你的硅基流动Key
+"\347\254\2543\345\221\250/py/llm_client.py":78:    return bool(key) and not key.startswith(("sk-your", "your-", "<"))
+
+
+(以上为空即表示仓库内无 sk- 开头的明文 Key)
+
+===== .env 是否被跟踪 =====
+.gitignore:10:.env	.env
+
+
+===== 被跟踪的大文件 Top6（git ls-tree -r -l HEAD） =====
+ 2,481,560 B  lib/mysql-connector-j-8.0.33.jar
+ 1,030,855 B  第4周/web/assets/echarts.min.js
+   684,420 B  第4周/docs/images/screen_01_dashboard.png
+   582,522 B  第4周/web/assets/china.json
+   476,431 B  第2周/docs/数仓架构设计文档.docx
+   246,892 B  第3周/docs/images/fig_01_gmv_trend.png
+
+说明：lib/mysql-connector-j-8.0.33.jar 是 Hive 连接 MySQL 的 JDBC 驱动，属必要依赖；
+仓库内无 zip / 数据文件 / 密钥文件被跟踪（.gitignore 已排除 *.zip、data/、.env）。
+
+小计：被跟踪文件 208 个。
