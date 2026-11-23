@@ -2,18 +2,22 @@
 ==============================================================================
   云购生活数仓 · 第 5 周 Git 提交历史审查（原始输出）
 ==============================================================================
-生成时间：2026-11-23 08:54:49
+生成时间：2026-11-23 08:57:05
 仓库：D:\xiangmushixun-bde
 
 ==============================================================================
   1. git log --oneline --graph --all --decorate
 ==============================================================================
-* 98a84a1 (HEAD -> docs/week5-integration) docs(git): 补第5周 PR/Issue 记录、Git 审查报告与第4周直提 main 说明
-* c8b505e docs(readme): 新增英文 README，并统一中文 README 的四层口径
-* 2aecbe9 docs(week5): 新增五篇项目级文档与联调记录（md + Word 双版本）
-* cbcc443 feat(integration): 新增端到端联调自检脚本与逐层核对 SQL
-* 7072b4c chore(docker): 服务数统一为 9 并挂载第 5 周脚本目录
-* 00a0658 (origin/main, origin/HEAD, main) chore(第4周): 刷新重启后三界面自检证据（8 服务从零启动复验通过）
+*   100c76a (HEAD -> main) merge: 合入第5周整合成果（联调脚本 + 五篇文档 + 英文 README + Git 治理）(PR #16)
+|\  
+| * 51a1b99 (docs/week5-integration) chore(evidence): 刷新第5周 Git 审查证据，并补生成脚本
+| * 98a84a1 docs(git): 补第5周 PR/Issue 记录、Git 审查报告与第4周直提 main 说明
+| * c8b505e docs(readme): 新增英文 README，并统一中文 README 的四层口径
+| * 2aecbe9 docs(week5): 新增五篇项目级文档与联调记录（md + Word 双版本）
+| * cbcc443 feat(integration): 新增端到端联调自检脚本与逐层核对 SQL
+| * 7072b4c chore(docker): 服务数统一为 9 并挂载第 5 周脚本目录
+|/  
+* 00a0658 (origin/main, origin/HEAD) chore(第4周): 刷新重启后三界面自检证据（8 服务从零启动复验通过）
 * 6f43b92 第4周：可视化实现（Superset + ECharts + Streamlit）与 Docker 一键部署
 * 383ec4c feat(run): 增加一键运行启动器与运行说明
 * 678a952 chore: 提交压缩包改为本地生成物，不再入库
@@ -66,10 +70,10 @@
 ==============================================================================
   docs/readme-index
   docs/readme-week3
-* docs/week5-integration
+  docs/week5-integration
   feat/ai-insight
   feat/llm-multi-provider
-  main
+* main
   remotes/origin/HEAD -> origin/main
   remotes/origin/docs/readme-index
   remotes/origin/docs/readme-week3
@@ -80,21 +84,21 @@
 ==============================================================================
   3. 提交类型统计（约定式提交前缀）
 ==============================================================================
-  docs          15  (35.7%)
-  feat          13  (31.0%)
-  chore          6  (14.3%)
-  merge          4  (9.5%)
-  refactor       2  (4.8%)
-  （无前缀）          1  (2.4%)
-  fix            1  (2.4%)
-  合计            42
+  docs          15  (34.1%)
+  feat          13  (29.5%)
+  chore          7  (15.9%)
+  merge          5  (11.4%)
+  refactor       2  (4.5%)
+  （无前缀）          1  (2.3%)
+  fix            1  (2.3%)
+  合计            44
   不符合约定式提交的条目：
     - 第4周：可视化实现（Superset + ECharts + Streamlit）与 Docker 一键部署
 
 ==============================================================================
   4. 提交总数与分支数
 ==============================================================================
-  提交总数：42
+  提交总数：44
   本地分支：6
   远端分支：6
   分支清单：
@@ -108,6 +112,8 @@
 ==============================================================================
   5. 全部提交（哈希 | 日期 | 作者 | 主题）
 ==============================================================================
+100c76a | 2026-11-23 | 余天乐 | merge: 合入第5周整合成果（联调脚本 + 五篇文档 + 英文 README + Git 治理）(PR #16)
+51a1b99 | 2026-11-23 | 余天乐 | chore(evidence): 刷新第5周 Git 审查证据，并补生成脚本
 98a84a1 | 2026-11-23 | 余天乐 | docs(git): 补第5周 PR/Issue 记录、Git 审查报告与第4周直提 main 说明
 c8b505e | 2026-11-23 | 余天乐 | docs(readme): 新增英文 README，并统一中文 README 的四层口径
 2aecbe9 | 2026-11-23 | 余天乐 | docs(week5): 新增五篇项目级文档与联调记录（md + Word 双版本）
@@ -170,12 +176,33 @@ README.en.md:301:- **Secrets discipline**: three-tier config (template → local
 第5周/docs/Git提交历史审查报告.md:115:| 仓库内是否有明文 Key | `git grep -n "sk-" -- .` | ✅ 5 处命中全部是占位符或文档示例（`sk-your-key-here`、`sk-你的DeepSeekKey`），无真实 Key |
 第5周/docs/部署手册.md:433:| 16 | 密钥不入库 | `git status` / `git grep "sk-"` | 看不到 `.env`，无明文 Key |
 第5周/docs/需求文档.md:120:| NFR-04 | 安全 | 密钥不进仓库、不进镜像、不进日志 | `.env` 被 `.gitignore` 排除；`git grep "sk-"` 无明文 |
-第5周/evidence/git_review.txt:121:"\347\254\2543\345\221\250/docs/NL2SQL\346\216\245\345\217\243\350\257\264\346\230\216.md":241:| 提供模板 | `.env.example` 只放占位符 `sk-your-key-here` |
-第5周/evidence/git_review.txt:122:"\347\254\2543\345\221\250/docs/NL2SQL\346\216\245\345\217\243\350\257\264\346\230\216.md":244:| 泄露可自查 | `git status` 看不到 `.env`；`git log -p` 搜不到 `sk-` |
-第5周/evidence/git_review.txt:123:"\347\254\2543\345\221\250/py/.env.example":31:# LLM_API_KEY=sk-你的DeepSeekKey
-第5周/evidence/git_review.txt:124:"\347\254\2543\345\221\250/py/.env.example":40:# LLM_API_KEY=sk-你的硅基流动Key
-第5周/evidence/git_review.txt:125:"\347\254\2543\345\221\250/py/llm_client.py":78:    return bool(key) and not key.startswith(("sk-your", "your-", "<"))
-第5周/evidence/git_review.txt:128:(以上为空即表示仓库内无 sk- 开头的明文 Key)
+第5周/evidence/git_review.txt:155:  6. 密钥泄露自查（git grep 'sk-'）
+第5周/evidence/git_review.txt:157:README.en.md:301:- **Secrets discipline**: three-tier config (template → local `.env` → container env). No key ever appears in code, image or log; `git grep "sk-"` returns nothing.
+第5周/evidence/git_review.txt:158:第3周/docs/NL2SQL接口说明.md:241:| 提供模板 | `.env.example` 只放占位符 `sk-your-key-here` |
+第5周/evidence/git_review.txt:159:第3周/docs/NL2SQL接口说明.md:244:| 泄露可自查 | `git status` 看不到 `.env`；`git log -p` 搜不到 `sk-` |
+第5周/evidence/git_review.txt:160:第3周/py/.env.example:31:# LLM_API_KEY=sk-你的DeepSeekKey
+第5周/evidence/git_review.txt:161:第3周/py/.env.example:40:# LLM_API_KEY=sk-你的硅基流动Key
+第5周/evidence/git_review.txt:162:第3周/py/llm_client.py:78:    return bool(key) and not key.startswith(("sk-your", "your-", "<"))
+第5周/evidence/git_review.txt:163:第4周/docs/提交清单核对_第4周.md:142:- [x] 代码中无明文 Key（`git grep -n "sk-"` 只有文档示例）
+第5周/evidence/git_review.txt:164:第4周/docs/第4周_API配置指南.md:110:LLM_API_KEY=sk-你的deepseek密钥
+第5周/evidence/git_review.txt:165:第4周/docs/第4周_API配置指南.md:211:| 2 | 仓库内无明文 Key | `git grep -n "sk-" -- .` | 无结果（除文档示例） |
+第5周/evidence/git_review.txt:166:第4周/py/llm_client.py:89:    return bool(key) and not key.startswith(("sk-your", "your-", "<"))
+第5周/evidence/git_review.txt:167:第4周/web/assets/app.css:57:  mask-image: radial-gradient(circle at 50% 42%, #000 42%, transparent 88%);
+第5周/evidence/git_review.txt:168:第5周/docs/API配置指南.md:129:LLM_API_KEY=sk-你的deepseek密钥
+第5周/evidence/git_review.txt:169:第5周/docs/API配置指南.md:350:| 2 | 仓库内无明文 Key | `git grep -n "sk-" -- .` | 无结果（除文档示例） |
+第5周/evidence/git_review.txt:170:第5周/docs/Git提交历史审查报告.md:115:| 仓库内是否有明文 Key | `git grep -n "sk-" -- .` | ✅ 5 处命中全部是占位符或文档示例（`sk-your-key-here`、`sk-你的DeepSeekKey`），无真实 Key |
+第5周/evidence/git_review.txt:171:第5周/docs/部署手册.md:433:| 16 | 密钥不入库 | `git status` / `git grep "sk-"` | 看不到 `.env`，无明文 Key |
+第5周/evidence/git_review.txt:172:第5周/docs/需求文档.md:120:| NFR-04 | 安全 | 密钥不进仓库、不进镜像、不进日志 | `.env` 被 `.gitignore` 排除；`git grep "sk-"` 无明文 |
+第5周/evidence/git_review.txt:173:第5周/evidence/git_review.txt:121:"\347\254\2543\345\221\250/docs/NL2SQL\346\216\245\345\217\243\350\257\264\346\230\216.md":241:| 提供模板 | `.env.example` 只放占位符 `sk-your-key-here` |
+第5周/evidence/git_review.txt:174:第5周/evidence/git_review.txt:122:"\347\254\2543\345\221\250/docs/NL2SQL\346\216\245\345\217\243\350\257\264\346\230\216.md":244:| 泄露可自查 | `git status` 看不到 `.env`；`git log -p` 搜不到 `sk-` |
+第5周/evidence/git_review.txt:175:第5周/evidence/git_review.txt:123:"\347\254\2543\345\221\250/py/.env.example":31:# LLM_API_KEY=sk-你的DeepSeekKey
+第5周/evidence/git_review.txt:176:第5周/evidence/git_review.txt:124:"\347\254\2543\345\221\250/py/.env.example":40:# LLM_API_KEY=sk-你的硅基流动Key
+第5周/evidence/git_review.txt:177:第5周/evidence/git_review.txt:125:"\347\254\2543\345\221\250/py/llm_client.py":78:    return bool(key) and not key.startswith(("sk-your", "your-", "<"))
+第5周/evidence/git_review.txt:178:第5周/evidence/git_review.txt:128:(以上为空即表示仓库内无 sk- 开头的明文 Key)
+第5周/evidence/git_review.txt:180:  说明：以上命中均为占位符或文档示例（如 sk-your-key-here、sk-你的DeepSeekKey），
+第5周/py/gen_git_review.py:91:head("6. 密钥泄露自查（git grep 'sk-'）")
+第5周/py/gen_git_review.py:92:hits = git("grep", "-n", "sk-", "--", ".")
+第5周/py/gen_git_review.py:96:    add("  说明：以上命中均为占位符或文档示例（如 sk-your-key-here、sk-你的DeepSeekKey），")
 
   说明：以上命中均为占位符或文档示例（如 sk-your-key-here、sk-你的DeepSeekKey），
         以及 llm_client.py 里用于识别占位符的 startswith 判断，无真实 Key。
@@ -198,7 +225,7 @@ README.en.md:301:- **Secrets discipline**: three-tier config (template → local
      266,753 B  第5周/docs/架构设计文档.docx
      246,892 B  第3周/docs/images/fig_01_gmv_trend.png
 
-  被跟踪文件合计：240 个，总体积 10.9 MB
+  被跟踪文件合计：241 个，总体积 10.9 MB
   说明：lib/mysql-connector-j-8.0.33.jar 是 Hive 连接 MySQL 的 JDBC 驱动（必要依赖）；
         echarts.min.js 与 china.json 是本地化资源（断网可演示）；
         仓库内无 zip / 数据文件 / 密钥文件被跟踪。

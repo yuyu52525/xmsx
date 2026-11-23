@@ -4,20 +4,21 @@
 
 are available in the Git repository at:
 
-  . docs/week5-integration
+  . main
 
-for you to fetch changes up to bcb2539cc1609a2fc5bdd6f505ee81c494fc4539:
+for you to fetch changes up to 100c76add8c0c2a6d4174110c15a13408ca6533a:
 
-  chore(evidence): 刷新第5周 Git 审查证据，并补生成脚本 (2026-11-23 08:55:04 +0800)
+  merge: 合入第5周整合成果（联调脚本 + 五篇文档 + 英文 README + Git 治理）(PR #16) (2026-11-23 08:55:52 +0800)
 
 ----------------------------------------------------------------
-余天乐 (6):
+余天乐 (7):
       chore(docker): 服务数统一为 9 并挂载第 5 周脚本目录
       feat(integration): 新增端到端联调自检脚本与逐层核对 SQL
       docs(week5): 新增五篇项目级文档与联调记录（md + Word 双版本）
       docs(readme): 新增英文 README，并统一中文 README 的四层口径
       docs(git): 补第5周 PR/Issue 记录、Git 审查报告与第4周直提 main 说明
       chore(evidence): 刷新第5周 Git 审查证据，并补生成脚本
+      merge: 合入第5周整合成果（联调脚本 + 五篇文档 + 英文 README + Git 治理）(PR #16)
 
  README.en.md                                       | 346 ++++++++++++++++
  README.md                                          |  31 +-
@@ -27,7 +28,7 @@ for you to fetch changes up to bcb2539cc1609a2fc5bdd6f505ee81c494fc4539:
  第5周/docs/Git提交历史审查报告.docx                | Bin 0 -> 42827 bytes
  第5周/docs/Git提交历史审查报告.md                  | 142 +++++++
  第5周/docs/git/issue_16_week5_scope.txt            |  52 +++
- .../docs/git/pull_request_16_week5_integration.txt |  76 ++++
+ .../docs/git/pull_request_16_week5_integration.txt |  90 +++++
  第5周/docs/git/week4_direct_to_main_explained.txt  |  53 +++
  第5周/docs/数据质量清洗报告.docx                   | Bin 0 -> 50939 bytes
  第5周/docs/数据质量清洗报告.md                     | 292 ++++++++++++++
@@ -54,7 +55,7 @@ for you to fetch changes up to bcb2539cc1609a2fc5bdd6f505ee81c494fc4539:
  第5周/sql/integrity_check.sql                      | 161 ++++++++
  第5周/一键运行/1_端到端联调自检.bat                |  17 +
  第5周/一键运行/2_导出文档取数.bat                  |  16 +
- 35 files changed, 4546 insertions(+), 10 deletions(-)
+ 35 files changed, 4560 insertions(+), 10 deletions(-)
  create mode 100644 README.en.md
  create mode 100644 第5周/docs/API配置指南.docx
  create mode 100644 第5周/docs/API配置指南.md
