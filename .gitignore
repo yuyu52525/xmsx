@@ -26,3 +26,6 @@ node_modules/
 
 # 提交压缩包（本地生成物，不入库）
 *.zip
+
+# Office 渲染预览临时目录（office-render 每次生成，不入库）
+.dsh-office-*/
