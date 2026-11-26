@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from datetime import datetime
 
@@ -121,122 +122,191 @@ def sidebar() -> None:
 
 
 # ---------------------------------------------------------------- 图表推断
-TIME_HINTS = ("date", "month", "day", "week", "hour", "时间", "月份", "日期", "时段")
+# 图表“看着怪”，多数不是渲染问题，而是选错图：
+# 把 15 个省份塞进饼图、把明细表画成散点、把占比画成折线。
+# 所以分两步：先按“结果形状 + 问题意图”选图（pick_chart），
+# 再按图类型做排序、截断、量纲换算（chart_option）。
+# 注意：ECharts 的 formatter 只支持字符串模板（{b}/{c}/{d}），
+# 不支持传 JS 函数，所以数值的单位换算在 Python 侧做完再喂给前端。
+TIME_HINTS = ("date", "month", "day", "week", "hour", "时间", "月份", "日期",
+              "时段", "年份", "周")
+SHARE_HINTS = ("占比", "比例", "构成", "结构", "份额", "分布", "百分比", "percent")
+REL_HINTS = ("关系", "相关", "散点")
+RATE_HINTS = ("率", "占比", "比例", "百分比", "share", "rate")
 
 
 def _is_timey(col: str, s: pd.Series) -> bool:
+    """判断是不是时间轴。按词边界匹配名称，避免 recency_days 这类被误判。"""
     name = str(col).lower()
-    if any(h in name for h in TIME_HINTS):
+    if re.search(r"(^|_)(date|month|day|week|hour|year)($|_)", name):
+        return True
+    if any(h in name for h in ("时间", "月份", "日期", "时段", "年份")):
         return True
     if s.dtype.kind in "biufc":
         return False
-    return s.astype(str).str.match(r"^\d{4}(-\d{2}){0,2}").fillna(False).all()
+    try:
+        return bool(s.astype(str).str.match(r"^\d{4}(-\d{2}){0,2}").fillna(False).all())
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _to_num(s: pd.Series) -> pd.Series:
+    """把可能带 Decimal / 字符串的列尽量转成 float。"""
+    return pd.to_numeric(s, errors="coerce")
 
 
 def _numeric_cols(df: pd.DataFrame) -> list[str]:
-    return [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c])]
+    """数值列：真正的数值列，外加“能转成数值”的 object 列（Decimal、数字字符串）。"""
+    out = []
+    for c in df.columns:
+        s = df[c]
+        if pd.api.types.is_numeric_dtype(s):
+            out.append(c)
+            continue
+        if s.dtype == object:
+            v = _to_num(s)
+            if v.notna().mean() >= 0.9 and v.notna().any():
+                out.append(c)
+    return out
 
 
-def guess_chart(df: pd.DataFrame) -> str:
-    """给一句 SQL 的结果猜一个合适的图：默认返回 line/bar/pie/scatter/table。"""
+def _dim_numeric(df: pd.DataFrame, num: list[str]) -> set[str]:
+    """看起来像“编码维度”的数值列（hour_of_day / level_rank 等），不该当度量。"""
+    dims: set[str] = set()
+    for c in num:
+        name = str(c).lower()
+        if re.search(r"(^|_)(hour|day|month|year|week|rank|level|code|id|no)($|_)", name):
+            v = _to_num(df[c]).dropna()
+            if len(v) and v.nunique() <= 60 and (v % 1 == 0).all():
+                dims.add(c)
+    return dims
+
+
+def _label_cols(df: pd.DataFrame, num: list[str]) -> list[str]:
+    """非度量列 = 全部列 - 度量列（编码维度会被剔出度量）。"""
+    dims = _dim_numeric(df, num)
+    return [c for c in df.columns if c not in num or c in dims]
+
+
+def _measure_cols(df: pd.DataFrame, num: list[str]) -> list[str]:
+    dims = _dim_numeric(df, num)
+    return [c for c in num if c not in dims]
+
+
+def _share_like(df: pd.DataFrame, question: str, num: list[str]) -> bool:
+    """是不是“看结构”的问题：问题里带占比词，或结果本身就是比例列。"""
+    q = (question or "").lower()
+    if any(h in q for h in SHARE_HINTS):
+        return True
+    for c in num:
+        if any(h in str(c) for h in RATE_HINTS):
+            return True
+        v = pd.to_numeric(df[c], errors="coerce").dropna()
+        if len(v) and v.max() <= 1.000001 and 0.98 <= v.sum() <= 1.02:
+            return True
+    return False
+
+
+def pick_chart(df: pd.DataFrame, question: str = "") -> tuple[str, str]:
+    """返回 (图表类型, 选择理由)。理由显示在页面上，方便判断该不该手动改。"""
     if df is None or df.empty:
-        return "table"
-    num = _numeric_cols(df)
-    if len(df) == 1 or not num:
-        return "table"
-    time_cols = [c for c in df.columns if _is_timey(c, df[c])]
+        return "table", "没有数据"
+    num = _measure_cols(df, _numeric_cols(df))
+    labs = _label_cols(df, _numeric_cols(df))
+    if not num:
+        return "table", "没有数值列，画图没有意义"
+    if len(df) == 1:
+        return "table", "只有一行，已用指标卡展示"
+
+    time_cols = [c for c in labs if _is_timey(c, df[c])]
     if time_cols and len(df) >= 3:
-        return "line"
-    if len(num) >= 2 and len(df) >= 20:
-        return "scatter"
-    if len(df) <= 12 and len(num) == 1:
-        return "pie"
-    return "bar"
+        return "line", "含时间列，按时间看趋势"
+
+    if labs and len(df) > 15:
+        ratio = df[labs[0]].nunique() / max(1, len(df))
+        if ratio > 0.95:
+            return "table", "首列几乎每行都不同，是明细不是分类"
+
+    if _share_like(df, question, num):
+        if len(df) <= 8:
+            return "pie", "占比类问题且项目不多，用饼图看结构"
+        return "bar", "占比类问题但项目较多，用条形更清楚"
+
+    q = (question or "").lower()
+    if len(num) >= 2 and len(df) >= 20 and any(h in q for h in REL_HINTS):
+        return "scatter", "两个数值看关系"
+
+    if len(num) == 1 and len(labs) >= 2 and 2 <= df[labs[1]].nunique() <= 8:
+        return "bar", f"按「{labs[0]}」分组、用「{labs[1]}」分系列对比"
+
+    if len(df) > 12:
+        return "bar", "分类较多，用条形并按数值排序"
+    return "bar", "分类对比"
+
+
+def _cut(s, n: int = 12) -> str:
+    s = "" if s is None else str(s)
+    return s if len(s) <= n else s[: n - 1] + "…"
+
+
+def _scale_of(values: list[float]) -> tuple[float, str]:
+    """数值量纲换算：>=1 亿用“亿”，>=1 万用“万”，避免坐标轴出现 36116687.06。"""
+    v = [abs(x) for x in values if x is not None and not pd.isna(x)]
+    if not v:
+        return 1.0, ""
+    m = max(v)
+    if m >= 1e8:
+        return 1e8, "（亿元）"
+    if m >= 1e4:
+        return 1e4, "（万元）"
+    return 1.0, ""
+
+
+def _pivot_series(df: pd.DataFrame, x_col: str, s_col: str,
+                  v_col: str) -> tuple[list[str], list[dict]]:
+    """一维表转多系列：x 取一组，series 取另一组。"""
+    piv = df.pivot_table(index=x_col, columns=s_col, values=v_col,
+                         aggfunc="sum").fillna(0)
+    xs = [str(i) for i in piv.index]
+    series = [{"name": str(c), "data": [float(v) for v in piv[c].tolist()]}
+              for c in piv.columns]
+    return xs, series
 
 
 def chart_option(df: pd.DataFrame, kind: str, title: str = "") -> dict:
-    """把 DataFrame 转成 ECharts option（够用的通用版本，不做过度设计）。"""
+    """DataFrame → ECharts option：排序、截断、量纲换算都在这里做。"""
     cols = list(df.columns)
-    num = _numeric_cols(df)
-    cats = [c for c in cols if c not in num]
-
-    def label_of(row) -> str:
-        if cats:
-            return " / ".join(str(row[c]) for c in cats[:2])
-        return str(row[cols[0]])
-
-    x = [label_of(r) for _, r in df.iterrows()]
-    y1 = num[0] if num else cols[-1]
+    _all = _numeric_cols(df)
+    num = _measure_cols(df, _all)
+    labs = _label_cols(df, _all)
+    _v0 = _to_num(df[num[0]]).fillna(0) if len(num) == 1 and len(df) > 0 else None
+    is_pct = any(any(h in str(c) for h in RATE_HINTS) for c in num) or \
+        (_v0 is not None and _v0.max() <= 1.000001 and 0.98 <= _v0.sum() <= 1.02)
 
     base = {
         "backgroundColor": "transparent",
-        "title": {"text": title, "left": "center", "textStyle": {"color": "#e9f4ff", "fontSize": 13}},
-        "tooltip": {"trigger": "axis" if kind in ("line", "bar") else "item"},
-        "textStyle": {"fontFamily": "Microsoft YaHei, PingFang SC, sans-serif", "color": "#dbe9f8"},
+        "title": {"text": title, "left": "center",
+                  "textStyle": {"color": "#e9f4ff", "fontSize": 13}},
+        "textStyle": {"fontFamily": "Microsoft YaHei, PingFang SC, sans-serif",
+                      "color": "#dbe9f8"},
         "color": ["#35d6ff", "#7c5cff", "#ffc857", "#27e2a4", "#ff7ab6", "#4f8bff"],
         "animationDuration": 600,
     }
 
-    if kind == "line":
-        time_cols = [c for c in df.columns if _is_timey(c, df[c])]
-        xdata = [str(v) for v in df[time_cols[0]]] if time_cols else x
-        return {
-            **base,
-            "legend": {"top": 6, "right": 10, "textStyle": {"color": "#8aa9cc", "fontSize": 11}},
-            "grid": {"left": 60, "right": 40, "top": 46, "bottom": 40},
-            "xAxis": {"type": "category", "data": xdata,
-                      "axisLabel": {"color": "#8aa9cc", "rotate": 30 if len(xdata) > 12 else 0},
-                      "axisLine": {"lineStyle": {"color": "rgba(120,170,220,.3)"}}},
-            "yAxis": {"type": "value", "axisLabel": {"color": "#8aa9cc"},
-                      "splitLine": {"lineStyle": {"color": "rgba(120,170,220,.12)"}}},
-            "series": [{
-                "name": c, "type": "line", "smooth": True, "symbolSize": 5,
-                "data": [None if pd.isna(v) else float(v) for v in df[c]],
-                "areaStyle": {"opacity": 0.12} if i == 0 else None,
-            } for i, c in enumerate(num)],
-        }
-
-    if kind == "bar":
-        series = [{
-            "name": c, "type": "bar", "barMaxWidth": 34,
-            "data": [None if pd.isna(v) else float(v) for v in df[c]],
-            "itemStyle": {"borderRadius": [3, 3, 0, 0]},
-        } for c in num]
-        return {
-            **base,
-            "legend": {"top": 6, "right": 10, "textStyle": {"color": "#8aa9cc", "fontSize": 11}},
-            "grid": {"left": 60, "right": 40, "top": 46, "bottom": 48},
-            "xAxis": {"type": "category", "data": x,
-                      "axisLabel": {"color": "#8aa9cc", "interval": 0, "rotate": 30},
-                      "axisLine": {"lineStyle": {"color": "rgba(120,170,220,.3)"}}},
-            "yAxis": {"type": "value", "axisLabel": {"color": "#8aa9cc"},
-                      "splitLine": {"lineStyle": {"color": "rgba(120,170,220,.12)"}}},
-            "series": series,
-        }
-
-    if kind == "pie":
-        return {
-            **base,
-            "tooltip": {"trigger": "item", "formatter": "{b}<br/>{c}（{d}%）"},
-            "legend": {"bottom": 0, "textStyle": {"color": "#8aa9cc", "fontSize": 11}},
-            "series": [{
-                "type": "pie", "radius": ["42%", "68%"], "center": ["50%", "46%"],
-                "label": {"color": "#dbe9f8", "formatter": "{b}\n{d}%"},
-                "data": [{"name": x[i], "value": float(df[y1].iloc[i])} for i in range(len(df))],
-            }],
-        }
-
+    # ---------------- 散点
     if kind == "scatter":
         xs = num[0]
         ys = num[1] if len(num) > 1 else num[0]
         return {
             **base,
-            "tooltip": {"trigger": "item", "formatter": "{c}"},
-            "grid": {"left": 70, "right": 30, "top": 30, "bottom": 46},
-            "xAxis": {"type": "value", "name": xs, "nameTextStyle": {"color": "#8aa9cc"},
+            "tooltip": {"trigger": "item"},
+            "grid": {"left": 76, "right": 30, "top": 30, "bottom": 46},
+            "xAxis": {"type": "value", "name": str(xs),
+                      "nameTextStyle": {"color": "#8aa9cc"},
                       "axisLabel": {"color": "#8aa9cc"},
                       "splitLine": {"lineStyle": {"color": "rgba(120,170,220,.12)"}}},
-            "yAxis": {"type": "value", "name": ys, "nameTextStyle": {"color": "#8aa9cc"},
+            "yAxis": {"type": "value", "name": str(ys),
+                      "nameTextStyle": {"color": "#8aa9cc"},
                       "axisLabel": {"color": "#8aa9cc"},
                       "splitLine": {"lineStyle": {"color": "rgba(120,170,220,.12)"}}},
             "series": [{
@@ -246,7 +316,106 @@ def chart_option(df: pd.DataFrame, kind: str, title: str = "") -> dict:
             }],
         }
 
-    return base
+    # ---------------- 组织 x 与系列
+    if len(labs) >= 2 and len(num) == 1 and 2 <= df[labs[1]].nunique() <= 8:
+        xs, series = _pivot_series(df, labs[0], labs[1], num[0])
+    else:
+        def label_of(row) -> str:
+            return " / ".join(str(row[c]) for c in labs[:2]) if labs else str(row[cols[0]])
+        xs = [label_of(r) for _, r in df.iterrows()]
+        series = [{"name": str(c),
+                   "data": [None if pd.isna(v) else float(v)
+                            for v in _to_num(df[c])]}
+                  for c in num[:4]]
+
+    # ---------------- 排序：时间升序，其余按数值降序
+    if kind == "line" and labs and _is_timey(labs[0], df[labs[0]]):
+        order = sorted(range(len(xs)), key=lambda i: str(xs[i]))
+    elif kind == "line":
+        order = list(range(len(xs)))
+    else:
+        totals = [sum((s["data"][i] or 0) for s in series) for i in range(len(xs))]
+        order = sorted(range(len(xs)), key=lambda i: -totals[i])
+    xs = [_cut(xs[i]) for i in order]
+    for s in series:
+        s["data"] = [s["data"][i] for i in order]
+
+    # ---------------- 饼图：前 8 项 + 其他
+    if kind == "pie":
+        vals = [v or 0 for v in series[0]["data"]]
+        if len(xs) > 9:
+            xs = xs[:8] + ["其他"]
+            vals = vals[:8] + [sum(vals[8:])]
+        return {
+            **base,
+            "tooltip": {"trigger": "item"},
+            "legend": {"type": "scroll", "bottom": 0,
+                       "textStyle": {"color": "#8aa9cc", "fontSize": 11}},
+            "series": [{
+                "type": "pie", "radius": ["40%", "66%"], "center": ["50%", "44%"],
+                "minAngle": 3, "avoidLabelOverlap": True,
+                "label": {"color": "#dbe9f8", "formatter": "{b}\n{d}%", "fontSize": 11},
+                "labelLine": {"length": 8, "length2": 6},
+                "data": [{"name": xs[i], "value": vals[i]} for i in range(len(xs))],
+            }],
+        }
+
+    # ---------------- 折线 / 柱状：量纲换算
+    flat = [v for s in series for v in s["data"] if v is not None]
+    div, unit = _scale_of(flat)
+    if is_pct:
+        div, unit = 1.0, "（比例）"
+    for s in series:
+        s["data"] = [None if v is None else round(v / div, 4) for v in s["data"]]
+
+    horizontal = kind == "bar" and (len(xs) > 8 or any(len(s) > 8 for s in xs))
+    cat_axis = {
+        "type": "category", "data": xs,
+        "axisLabel": {"color": "#8aa9cc",
+                      "interval": 0 if len(xs) <= 12 else "auto",
+                      "rotate": 0 if horizontal else (30 if len(xs) > 6 else 0)},
+        "axisLine": {"lineStyle": {"color": "rgba(120,170,220,.3)"}},
+    }
+    val_axis = {"type": "value", "name": unit.strip("（）"),
+                "nameTextStyle": {"color": "#8aa9cc", "fontSize": 10},
+                "axisLabel": {"color": "#8aa9cc"},
+                "splitLine": {"lineStyle": {"color": "rgba(120,170,220,.12)"}}}
+
+    if kind == "line":
+        return {
+            **base,
+            "tooltip": {"trigger": "axis"},
+            "legend": {"type": "scroll", "top": 6, "right": 10,
+                       "textStyle": {"color": "#8aa9cc", "fontSize": 11}},
+            "grid": {"left": 66, "right": 40, "top": 48, "bottom": 46},
+            "xAxis": {**cat_axis, "rotate": 30 if len(xs) > 12 else 0},
+            "yAxis": val_axis,
+            "dataZoom": [{"type": "inside"}] if len(xs) > 30 else [],
+            "series": [{"name": s["name"], "type": "line",
+                        "smooth": len(xs) <= 60,
+                        "symbolSize": 4 if len(xs) > 40 else 6,
+                        "showSymbol": len(xs) <= 40, "data": s["data"]}
+                       for s in series],
+        }
+
+    return {
+        **base,
+        "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+        "legend": {"type": "scroll", "top": 6, "right": 10,
+                   "textStyle": {"color": "#8aa9cc", "fontSize": 11}},
+        "grid": {"left": 72 if horizontal else 66, "right": 28,
+                 "top": 46, "bottom": 46 if horizontal else 58},
+        "xAxis": val_axis if horizontal else cat_axis,
+        "yAxis": cat_axis if horizontal else val_axis,
+        "series": [{
+            "name": s["name"], "type": "bar", "barMaxWidth": 30,
+            "data": s["data"],
+            "itemStyle": {"borderRadius": [3, 3, 0, 0] if not horizontal else [0, 3, 3, 0]},
+            "label": {"show": len(series) == 1 and len(xs) <= 12,
+                      "position": "right" if horizontal else "top",
+                      "color": "#9fb8d4", "fontSize": 9},
+        } for s in series],
+    }
 
 
 def render_chart(df: pd.DataFrame, kind: str, height: int = 380, title: str = "") -> None:
@@ -312,12 +481,13 @@ def render_turn(turn: dict, idx: int) -> None:
     else:
         tab1, tab2 = st.tabs(["📊 图表", "📋 数据表"])
         with tab1:
-            auto = guess_chart(df)
+            auto, why = pick_chart(df, q)
             kind = st.radio(
                 "图表类型", ["自动", "折线", "柱状", "饼图", "散点", "仅表格"],
                 index=0, horizontal=True, key=f"kind{idx}",
-                help=f"自动推断结果：{auto}",
+                help=f"自动推断：{auto}（{why}）",
             )
+            st.caption(f"自动选图：{auto} ｜ 理由：{why}")
             mapping = {"自动": auto, "折线": "line", "柱状": "bar",
                        "饼图": "pie", "散点": "scatter", "仅表格": "table"}
             chosen = mapping[kind]

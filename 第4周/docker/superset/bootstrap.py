@@ -467,9 +467,12 @@ from ydsh_ads.ads_province_sales
 
     # ④ 区域分布地图（Superset 内置中国地图，需 NAME_1 英文名）
     map_metric = metric(cols["v_province_map"]["gmv"], "GMV")
+    # 注意：country_map 的查询不会自动把 entity 当 groupby，
+    # 不显式给 groupby 就会退化成"整表 sum 一行"，返回单个数字，
+    # 前端拿不到省级明细 → 地图全白（2026-11-26 实测用户报障后修）。
     cid = ensure_chart(
         "④ 省份销售分布（地图）", ds["v_province_map"], "country_map",
-        {"entity": "province_map",
+        {"entity": "province_map", "groupby": ["province_map"],
          "metric": map_metric, "metrics": [map_metric],
          "select_country": "china", "country_fieldtype": "NAME_1",
          "linear_color_scheme": "blue_white_yellow", "number_format": ",.2f"},
