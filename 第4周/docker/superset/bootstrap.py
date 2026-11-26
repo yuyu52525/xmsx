@@ -465,19 +465,21 @@ from ydsh_ads.ads_province_sales
         existing, args.rebuild)
     charts.append(("品类柱状", cid))
 
-    # ④ 区域分布地图（Superset 内置中国地图，需 NAME_1 英文名）
-    map_metric = metric(cols["v_province_map"]["gmv"], "GMV")
-    # 注意：country_map 的查询不会自动把 entity 当 groupby，
-    # 不显式给 groupby 就会退化成"整表 sum 一行"，返回单个数字，
-    # 前端拿不到省级明细 → 地图全白（2026-11-26 实测用户报障后修）。
+    # ④ 省份销售 TopN（横向条形）
+    # 为什么不是地图（2026-11-26 决定）：country_map 在本镜像里始终渲染空白——
+    #   数据侧已确认按省聚合返回 15 行、geo 的 NAME_1 与映射后的英文省名完全一致，
+    #   补了 groupby 前端仍不出图，判断为插件侧问题，继续排查性价比低。
+    #   改为条形看区域排名；“中国地图”能力保留在 ECharts 大屏（第4周/web，
+    #   已核对 15 个省名与 china.json 100% 匹配）。
+    prov_metric = metric(cols["ads_province_sales"]["gmv"], "GMV")
     cid = ensure_chart(
-        "④ 省份销售分布（地图）", ds["v_province_map"], "country_map",
-        {"entity": "province_map", "groupby": ["province_map"],
-         "metric": map_metric, "metrics": [map_metric],
-         "select_country": "china", "country_fieldtype": "NAME_1",
-         "linear_color_scheme": "blue_white_yellow", "number_format": ",.2f"},
+        "④ 省份销售 TopN（条形）", ds["ads_province_sales"], "echarts_timeseries_bar",
+        {"x_axis": "province", "metrics": [prov_metric], "groupby": [],
+         "row_limit": 20, "orientation": "horizontal",
+         "x_axis_sort": "GMV", "x_axis_sort_asc": False,
+         "order_desc": True, "show_legend": False},
         existing, args.rebuild)
-    charts.append(("省份地图", cid))
+    charts.append(("省份条形", cid))
 
     # ⑤ 支付方式占比饼图（依赖第 4 周新建的 ads_pay_type_month）
     cid = ensure_chart(

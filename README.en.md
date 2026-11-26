@@ -109,7 +109,7 @@ This project turns that raw material into something an executive can read in one
 
 **Visualization**
 
-- **Superset** dashboard: 6 charts (KPI cards, monthly trend, category bars, China map, payment pie, store ranking), 3 native filters and cross-filtering — created entirely through the REST API and re-runnable (`superset-init` is idempotent).
+- **Superset** dashboard: 6 charts (KPI cards, monthly trend, category bars, province ranking bars, payment pie, store ranking), 3 native filters and cross-filtering — created entirely through the REST API and re-runnable (`superset-init` is idempotent).
 - **ECharts data wall**: 7 panel types at a 1920×1080 design size with `transform: scale()` responsiveness, fully localized assets (works offline) and a JSON snapshot fallback if the API is down.
 - **Streamlit Q&A**: question → SQL → guard → execute → table + chart, with history, error surfacing, CSV export.
 
